@@ -4,6 +4,7 @@
 
 CURSRSensor Sensor;
 CURSRData Data;
+CURSRRadio Radio;
 
 void radioThread(void *pvParameters);
 void flightThread(void *pvParameters);
@@ -33,10 +34,11 @@ void loop() {}
 
 void radioThread(void *pvParameters)
 {
+  Radio.loraSetup();
   while (true)
   {
-    Serial.println("Value from Radio Thread: " + String(Sensor.getSensorValue()));
-    delay(1000);
+    Serial.println(Data.getEncodedSensorData());
+    Radio.send(Data.getEncodedSensorData());
   }
 }
 
@@ -46,8 +48,6 @@ void flightThread(void *pvParameters)
   while (true)
   {
     Sensor.readSensor();
-
-    Serial.println("Value from Flight Thread: " + String(Sensor.getSensorValue()));
-    delay(200);
+    Sensor.getSensorValue(&Data);
   }
 }

@@ -35,31 +35,36 @@ void CURSRSensor::log(String message)
 /**
  * @brief Reads the sensor value.
  *
- * This function reads the sensor value and stores it in the sensorValue variable.
+ * This function reads the sensor value and stores it in the sensor value variables.
  */
 void CURSRSensor::readSensor()
 {
   if (bmp390Available)
   {
-    sensorValue = bmp.readPressure();
+    altitude = bmp.readAltitude(BMP390_SEE_LEVEL_PRESSURE);
+    temperature = bmp.readTemperature();
+    pressure = bmp.readPressure();
   }
   else
   {
-    sensorValue = 0;
+    altitude = 0;
+    temperature = 0;
+    pressure = 0;
   }
-  log("Sensor value: " + String(sensorValue));
+  // log("Sensor value: " + String(altitude) + "m, " + String(temperature) + "C, " + String(pressure) + "Pa");
 }
 
 /**
- * @brief Returns the sensor value.
+ * @brief Gets the sensor value.
  *
- * This function returns the sensor value.
+ * This function gets the sensor value and stores it in the data object.
  *
- * @return The sensor value.
+ * @param data The data object to store the sensor value.
  */
-long CURSRSensor::getSensorValue()
+void CURSRSensor::getSensorValue(CURSRData *data)
 {
-  return sensorValue;
+  data->setPressure(pressure);
+  data->setTemperature(temperature);
 }
 
 void CURSRSensor::setBMP390Available(bool available)

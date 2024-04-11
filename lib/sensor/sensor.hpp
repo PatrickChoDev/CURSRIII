@@ -22,12 +22,16 @@
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BMP3XX.h"
 
+#include <data.hpp>
+
 extern class CURSRSensor
 {
 private:
-  float sensorValue = 0;
-  bool bmp390Available = false;
   Adafruit_BMP3XX bmp;
+  bool bmp390Available = false;
+  float temperature = 0;
+  float pressure = 0;
+  float altitude = 0;
   void log(String message);
 
 public:
@@ -37,7 +41,7 @@ public:
   };
   void setup();
   void readSensor();
-  float getSensorValue();
+  void getSensorValue(CURSRData *data);
   void setBMP390Available(bool available);
   void checkBMP390Sensor();
 } Sensor;

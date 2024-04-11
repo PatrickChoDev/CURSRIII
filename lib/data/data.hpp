@@ -7,6 +7,8 @@
 #define DATA_LOG_ENABLED 1
 #endif
 
+#ifndef DATA_HPP
+#define DATA_HPP
 struct SensorData
 {
   float temperature;
@@ -39,3 +41,5 @@ public:
   void setGyroscopeY(float gyroscopeY);
   void setGyroscopeZ(float gyroscopeZ);
 };
+
+#endif
