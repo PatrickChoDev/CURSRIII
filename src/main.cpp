@@ -1,18 +1,53 @@
-#include <Arduino.h>
+#include <flightcom.h>
 
-// put function declarations here:
-int myFunction(int, int);
+#define SENSOR_LOG_ENABLED 0
 
-void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+CURSRSensor Sensor;
+CURSRData Data;
+
+void radioThread(void *pvParameters);
+void flightThread(void *pvParameters);
+
+void setup()
+{
+  Serial.begin(115200);
+  xTaskCreatePinnedToCore(
+      radioThread,
+      "Radio Thread",
+      10000,
+      NULL,
+      1,
+      NULL,
+      0);
+  xTaskCreatePinnedToCore(
+      flightThread,
+      "Flight Thread",
+      10000,
+      NULL,
+      1,
+      NULL,
+      1);
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
+void loop() {}
+
+void radioThread(void *pvParameters)
+{
+  while (true)
+  {
+    Serial.println("Value from Radio Thread: " + String(Sensor.getSensorValue()));
+    delay(1000);
+  }
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+void flightThread(void *pvParameters)
+{
+  Sensor.setup();
+  while (true)
+  {
+    Sensor.readSensor();
+
+    Serial.println("Value from Flight Thread: " + String(Sensor.getSensorValue()));
+    delay(200);
+  }
 }
