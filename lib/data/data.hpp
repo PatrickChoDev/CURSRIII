@@ -3,6 +3,11 @@
 #include <Arduino.h>
 #endif
 
+#ifndef KALMAN_H
+#define KALMAN_H
+#include <kalman.h>
+#endif
+
 #ifndef DATA_LOG_ENABLED
 #define DATA_LOG_ENABLED 1
 #endif
@@ -25,6 +30,7 @@ class CURSRData
 {
 private:
   SensorData sensorData;
+  SensorData kalmanData;
   void log(String message);
 
 public:
