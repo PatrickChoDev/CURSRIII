@@ -43,6 +43,6 @@ public:
   void setFlightStage(FlightStage flightStage);
   void writeLog(char *message);
   void logData(char *data);
-}
+};
 
 #endif
