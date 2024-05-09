@@ -45,6 +45,9 @@ void radioThread(void *pvParameters)
 void flightThread(void *pvParameters)
 {
   Sensor.setup();
+  Sensor.readSensor();
+  Sensor.getSensorValue(&Data);
+  Data.init(Data.getRawSensorData());
   while (true)
   {
     Sensor.readSensor();

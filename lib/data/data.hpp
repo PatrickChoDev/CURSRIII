@@ -26,15 +26,40 @@ struct SensorData
   float gyroscopeZ;
 };
 
+class KalmanFilterMetrics
+{
+private:
+  float temperatureTime = millis() / 1000.f;
+  float pressureTime = millis() / 1000.f;
+  float accelerationTime = millis() / 1000.f;
+  float gyroscopeTime = millis() / 1000.f;
+  KalmanFilter temperature;
+  KalmanFilter pressure;
+  KalmanFilter acceleration;
+  KalmanFilter gyroscope;
+  SensorData kalmanData;
+
+public:
+  KalmanFilterMetrics();
+  void init(SensorData sensorData);
+  SensorData getKalmanData();
+  void setTemperature(float temp);
+  void setPressure(float pres);
+  void setAcceleration(float accX, float accY, float accZ);
+  void setGyroscope(float gyroX, float gyroY, float gyroZ);
+};
+
 class CURSRData
 {
 private:
   SensorData sensorData;
-  SensorData kalmanData;
+  KalmanFilterMetrics kalmanFilterMetrics = KalmanFilterMetrics();
   void log(String message);
 
 public:
-  SensorData getSensorData();
+  SensorData getRawSensorData();
+  SensorData getKalmanFilteredData();
+  void init(SensorData sensorData);
   void setSensorData(SensorData sensorData);
   char *getEncodedSensorData();
   void decodeSensorData(char *encodedData);
