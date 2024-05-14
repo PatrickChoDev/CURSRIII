@@ -10,7 +10,9 @@ void CURSRFilesystem::log(char *message)
 void CURSRFilesystem::setup()
 {
   log("Setting up filesystem...");
-  if (SD.begin(SD_CARD_SS_PIN))
+  SPI.begin(18, 16, 17, SD_CARD_SS_PIN);
+  SPI.setDataMode(SPI_MODE0);
+  if (SD.begin(SD_CARD_SS_PIN, SPI, 40000000, "/sd", 5U, true))
   {
     this->memoryAvailable = true;
     log("Filesystem setup complete.");
@@ -30,6 +32,11 @@ FlightStage CURSRFilesystem::getFlightStage()
 
 void CURSRFilesystem::loadFlightStage()
 {
+  if (!memoryAvailable)
+  {
+    log("Memory not available.");
+    return;
+  }
   log("Loading flight stage...");
   flightStage = SD.exists("/flight_stage") ? (FlightStage)SD.open("/flight_stage").read() : PRELAUNCH;
   log("Flight stage loaded.");

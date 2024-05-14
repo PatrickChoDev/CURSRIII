@@ -1,10 +1,9 @@
 #include <flightcom.h>
 
-#define SENSOR_LOG_ENABLED 0
-
 CURSRSensor Sensor;
 CURSRData Data;
 CURSRRadio Radio;
+CURSRFilesystem Filesystem;
 
 void radioThread(void *pvParameters);
 void flightThread(void *pvParameters);
@@ -25,7 +24,7 @@ void setup()
       "Flight Thread",
       10000,
       NULL,
-      1,
+      2,
       NULL,
       1);
 }
@@ -40,17 +39,20 @@ void radioThread(void *pvParameters)
     Serial.println(Data.getEncodedSensorData());
     Radio.send(Data.getEncodedSensorData());
   }
+  return;
 }
 
 void flightThread(void *pvParameters)
 {
+  Filesystem.setup();
   Sensor.setup();
   Sensor.readSensor();
-  Sensor.getSensorValue(&Data);
-  Data.init(Data.getRawSensorData());
+  // Sensor.getSensorValue(Data);
+  // Data.init(Data.getRawSensorData());
   while (true)
   {
     Sensor.readSensor();
-    Sensor.getSensorValue(&Data);
+    // Sensor.getSensorValue(Data);
   }
+  return;
 }

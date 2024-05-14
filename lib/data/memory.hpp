@@ -3,7 +3,7 @@
 #endif
 
 #ifndef SD_CARD_SS_PIN
-#define SD_CARD_SS_PIN 34
+#define SD_CARD_SS_PIN 5
 #endif
 
 #ifdef ARDUINO_H
@@ -30,13 +30,13 @@ class CURSRFilesystem
 {
 private:
   bool memoryAvailable = false;
-  void setup();
   void log(char *message);
   FlightStage flightStage = PRELAUNCH;
   File systemLogFile = SD.open("system_log", FILE_WRITE);
   File flightLogFile = SD.open("flight_log", FILE_WRITE);
 
 public:
+  void setup();
   FlightStage getFlightStage();
   void loadFlightStage();
   void saveFlightStage();

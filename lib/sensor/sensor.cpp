@@ -1,6 +1,8 @@
 
 #include <sensor.hpp>
 #include <bmp390.hpp>
+#include <adxl375.hpp>
+#include <maxm10s.hpp>
 
 /**
  * @brief Sets up the sensor.
@@ -15,6 +17,8 @@ void CURSRSensor::setup()
 {
   log("Start sensor setup");
   checkBMP390Sensor();
+  checkADXLSensor();
+  checkMAXM10SSensor();
 }
 
 /**
@@ -26,10 +30,9 @@ void CURSRSensor::setup()
  */
 void CURSRSensor::log(String message)
 {
-  if (SENSOR_LOG_ENABLED)
-  {
-    Serial.println(message);
-  }
+#if (SENSOR_LOG_ENABLED)
+  Serial.println(message);
+#endif
 }
 
 /**
@@ -39,19 +42,63 @@ void CURSRSensor::log(String message)
  */
 void CURSRSensor::readSensor()
 {
+#if (BMP390_ENABLED)
   if (bmp390Available)
   {
+
     altitude = bmp.readAltitude(BMP390_SEE_LEVEL_PRESSURE);
     temperature = bmp.readTemperature();
     pressure = bmp.readPressure();
+
+    log("Sensor value: " + String(altitude) + "m, " + String(temperature) + "C, " + String(pressure) + "Pa");
   }
   else
   {
     altitude = 0;
     temperature = 0;
     pressure = 0;
+    accelX = 0;
+    accelY = 0;
+    accelZ = 0;
   }
-  // log("Sensor value: " + String(altitude) + "m, " + String(temperature) + "C, " + String(pressure) + "Pa");
+#endif
+#if (ADXL375_ENABLED)
+  if (ADXLAvailable)
+  {
+    sensors_event_t event;
+    accel.getEvent(&event);
+    accelX = event.acceleration.x;
+    accelY = event.acceleration.y;
+    accelZ = event.acceleration.z;
+    log("Accel value: " + String(accelX) + ", " + String(accelY) + ", " + String(accelZ) + "m/s^2");
+  }
+  else
+  {
+    accelX = 0;
+    accelY = 0;
+    accelZ = 0;
+  }
+#endif
+#if (MAXM10S_ENABLED)
+  if (maxm10sAvailable && gnss.getPVT() == true)
+  {
+    int32_t latitude = gnss.getLatitude();
+    Serial.print(F("Lat: "));
+    Serial.print(latitude);
+
+    int32_t longitude = gnss.getLongitude();
+    Serial.print(F(" Long: "));
+    Serial.print(longitude);
+    Serial.print(F(" (degrees * 10^-7)"));
+
+    int32_t altitude = gnss.getAltitudeMSL(); // Altitude above Mean Sea Level
+    Serial.print(F(" Alt: "));
+    Serial.print(altitude);
+    Serial.print(F(" (mm)"));
+
+    Serial.println();
+  }
+#endif
 }
 
 /**
@@ -61,10 +108,10 @@ void CURSRSensor::readSensor()
  *
  * @param data The data object to store the sensor value.
  */
-void CURSRSensor::getSensorValue(CURSRData *data)
+void CURSRSensor::getSensorValue(CURSRData data)
 {
-  data->setPressure(pressure);
-  data->setTemperature(temperature);
+  data.setPressure(pressure);
+  data.setTemperature(temperature);
 }
 
 void CURSRSensor::setBMP390Available(bool available)

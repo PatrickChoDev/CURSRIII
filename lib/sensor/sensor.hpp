@@ -21,6 +21,8 @@
 
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BMP3XX.h"
+#include <Adafruit_ADXL375.h>
+#include <SparkFun_u-blox_GNSS_v3.h>
 
 #include <data.hpp>
 
@@ -28,11 +30,21 @@ extern class CURSRSensor
 {
 private:
   Adafruit_BMP3XX bmp;
+  Adafruit_ADXL375 accel = Adafruit_ADXL375(12345);
+  SFE_UBLOX_GNSS gnss;
   bool bmp390Available = false;
+  bool ADXLAvailable = false;
   float temperature = 0;
   float pressure = 0;
   float altitude = 0;
+  float accelX = 0;
+  float accelY = 0;
+  float accelZ = 0;
   void log(String message);
+  void checkBMP390Sensor();
+  void checkADXLSensor();
+  void checkMAXM10SSensor();
+  bool maxm10sAvailable = false;
 
 public:
   CURSRSensor()
@@ -41,9 +53,8 @@ public:
   };
   void setup();
   void readSensor();
-  void getSensorValue(CURSRData *data);
+  void getSensorValue(CURSRData data);
   void setBMP390Available(bool available);
-  void checkBMP390Sensor();
 } Sensor;
 
 #endif
