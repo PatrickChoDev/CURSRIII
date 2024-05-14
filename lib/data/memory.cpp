@@ -77,6 +77,6 @@ void CURSRFilesystem::logData(char *data)
 
   // Write timestamp to flight log file
   flightLogFile.print(timestamp);
-  flightLogFile.print(", ");
+  flightLogFile.print(" ");
   flightLogFile.println(data);
 }

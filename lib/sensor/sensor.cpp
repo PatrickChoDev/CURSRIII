@@ -108,10 +108,15 @@ void CURSRSensor::readSensor()
  *
  * @param data The data object to store the sensor value.
  */
-void CURSRSensor::getSensorValue(CURSRData data)
+void CURSRSensor::getSensorValue(CURSRData *data)
 {
-  data.setPressure(pressure);
-  data.setTemperature(temperature);
+  // data->setAltitude(altitude);
+  // data->setAccelX(accelX);
+  // data->setAccelY(accelY);
+  // data->setAccelZ(accelZ);
+  data->setPressure(pressure);
+  data->setTemperature(temperature);
+  Serial.println("Data set");
 }
 
 void CURSRSensor::setBMP390Available(bool available)

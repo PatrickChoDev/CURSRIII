@@ -1,31 +1,21 @@
 #include <data.hpp>
 
 /**
- * @brief Constructor for the KalmanFilterMetrics class.
- *
- * This function initializes the KalmanFilterMetrics class.
- */
-KalmanFilterMetrics::KalmanFilterMetrics()
-{
-  gyroscope.init(3);
-  acceleration.init(3);
-}
-
-/**
  * @brief Initializes the Kalman filter.
  *
  * This function initializes the Kalman filter with the sensor data.
  *
  * @param sensorData The sensor data to initialize the Kalman filter.
  */
-void KalmanFilterMetrics::init(SensorData sensorData)
+void KalmanFilterMetrics::init(SensorData *sensorData)
 {
-  temperature.set(sensorData.temperature);
-  pressure.set(sensorData.pressure);
-  float acc[3] = {sensorData.accelerationX, sensorData.accelerationY, sensorData.accelerationZ};
-  acceleration.set(acc, 3);
-  float gyro[3] = {sensorData.gyroscopeX, sensorData.gyroscopeY, sensorData.gyroscopeZ};
-  gyroscope.set(gyro, 3);
+  Serial.println("Kalman filter initialized");
+  // temperature.set(sensorData->temperature);
+  // pressure.set(sensorData->pressure);
+  // float acc[3] = {sensorData->accelerationX, sensorData->accelerationY, sensorData->accelerationZ};
+  // acceleration.set(acc, 3);
+  // float gyro[3] = {sensorData->gyroscopeX, sensorData->gyroscopeY, sensorData->gyroscopeZ};
+  // gyroscope.set(gyro, 3);
 }
 
 /**
@@ -49,11 +39,7 @@ SensorData KalmanFilterMetrics::getKalmanData()
  */
 void KalmanFilterMetrics::setTemperature(float temp)
 {
-  float dt = (millis() / 1000.f) - temperatureTime;
-  temperatureTime = millis() / 1000.f;
-  temperature.predict(dt);
-  temperature.correct(temp);
-  kalmanData.temperature = temperature.get();
+  kalmanData.temperature = temperature.updateEstimate(temp);
 }
 
 /**
@@ -65,11 +51,7 @@ void KalmanFilterMetrics::setTemperature(float temp)
  */
 void KalmanFilterMetrics::setPressure(float pres)
 {
-  float dt = (millis() / 1000.f) - pressureTime;
-  pressureTime = millis() / 1000.f;
-  pressure.predict(dt);
-  pressure.correct(pres);
-  kalmanData.pressure = pressure.get();
+  kalmanData.pressure = pressure.updateEstimate(pres);
 }
 
 /**
@@ -83,14 +65,9 @@ void KalmanFilterMetrics::setPressure(float pres)
  */
 void KalmanFilterMetrics::setAcceleration(float accX, float accY, float accZ)
 {
-  float dt = (millis() / 1000.f) - accelerationTime;
-  accelerationTime = millis() / 1000.f;
-  float acc[3] = {accX, accY, accZ};
-  acceleration.predict(dt);
-  acceleration.correct(acc, 3);
-  kalmanData.accelerationX = acceleration.get(0);
-  kalmanData.accelerationY = acceleration.get(1);
-  kalmanData.accelerationZ = acceleration.get(2);
+  kalmanData.accelerationX = accelerationX.updateEstimate(accX);
+  kalmanData.accelerationY = accelerationY.updateEstimate(accY);
+  kalmanData.accelerationZ = accelerationZ.updateEstimate(accZ);
 }
 
 /**
@@ -104,14 +81,9 @@ void KalmanFilterMetrics::setAcceleration(float accX, float accY, float accZ)
  */
 void KalmanFilterMetrics::setGyroscope(float gyroX, float gyroY, float gyroZ)
 {
-  float dt = (millis() / 1000.f) - gyroscopeTime;
-  gyroscopeTime = millis() / 1000.f;
-  float gyro[3] = {gyroX, gyroY, gyroZ};
-  gyroscope.predict(dt);
-  gyroscope.correct(gyro, 3);
-  kalmanData.gyroscopeX = gyroscope.get(0);
-  kalmanData.gyroscopeY = gyroscope.get(1);
-  kalmanData.gyroscopeZ = gyroscope.get(2);
+  kalmanData.gyroscopeX = gyroscopeX.updateEstimate(gyroX);
+  kalmanData.gyroscopeY = gyroscopeY.updateEstimate(gyroY);
+  kalmanData.gyroscopeZ = gyroscopeZ.updateEstimate(gyroZ);
 }
 
 /**
@@ -136,7 +108,8 @@ void CURSRData::log(String message)
  */
 void CURSRData::init(SensorData sensorData)
 {
-  kalmanFilterMetrics.init(sensorData);
+  kalmanFilterMetrics.init(&sensorData);
+  log("Data initialized");
 }
 
 /**

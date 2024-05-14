@@ -53,7 +53,7 @@ public:
   };
   void setup();
   void readSensor();
-  void getSensorValue(CURSRData data);
+  void getSensorValue(CURSRData *data);
   void setBMP390Available(bool available);
 } Sensor;
 

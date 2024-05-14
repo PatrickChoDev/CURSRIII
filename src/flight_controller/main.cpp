@@ -47,12 +47,17 @@ void flightThread(void *pvParameters)
   Filesystem.setup();
   Sensor.setup();
   Sensor.readSensor();
-  // Sensor.getSensorValue(Data);
-  // Data.init(Data.getRawSensorData());
+  Data.init(Data.getRawSensorData());
   while (true)
   {
     Sensor.readSensor();
-    // Sensor.getSensorValue(Data);
+    Sensor.getSensorValue(&Data);
+    Serial.println(Data.getEncodedSensorData());
+    Filesystem.logData(Data.getEncodedSensorData());
+    Serial.println("Flight stage: " + String(Filesystem.getFlightStage()));
+    Serial.println("Pressure: " + String(Data.getKalmanFilteredData().pressure));
+
+    delay(1000);
   }
   return;
 }

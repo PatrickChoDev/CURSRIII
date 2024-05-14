@@ -5,7 +5,7 @@
 
 #ifndef KALMAN_H
 #define KALMAN_H
-#include <kalman.h>
+#include <SimpleKalmanFilter.h>
 #endif
 
 #ifndef DATA_LOG_ENABLED
@@ -33,15 +33,19 @@ private:
   float pressureTime = millis() / 1000.f;
   float accelerationTime = millis() / 1000.f;
   float gyroscopeTime = millis() / 1000.f;
-  KalmanFilter temperature;
-  KalmanFilter pressure;
-  KalmanFilter acceleration;
-  KalmanFilter gyroscope;
+  SimpleKalmanFilter pressureKalmanFilter = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter temperature = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter pressure = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter accelerationX = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter accelerationY = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter accelerationZ = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter gyroscopeX = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter gyroscopeY = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter gyroscopeZ = SimpleKalmanFilter(1, 1, 0.01);
   SensorData kalmanData;
 
 public:
-  KalmanFilterMetrics();
-  void init(SensorData sensorData);
+  void init(SensorData *sensorData);
   SensorData getKalmanData();
   void setTemperature(float temp);
   void setPressure(float pres);
@@ -53,7 +57,7 @@ class CURSRData
 {
 private:
   SensorData sensorData;
-  KalmanFilterMetrics kalmanFilterMetrics = KalmanFilterMetrics();
+  KalmanFilterMetrics kalmanFilterMetrics;
   void log(String message);
 
 public:
