@@ -6,7 +6,8 @@
 #define SD_CARD_SS_PIN 5
 #endif
 
-#ifdef ARDUINO_H
+#ifndef ARDUINO_H
+#define ARDUINO_H
 #include <Arduino.h>
 #endif
 
@@ -17,6 +18,8 @@
 
 #ifndef MEMORY_HPP
 #define MEMORY_HPP
+
+#include <data.hpp>
 
 enum FlightStage
 {
@@ -34,6 +37,7 @@ private:
   FlightStage flightStage = PRELAUNCH;
   File systemLogFile = SD.open("system_log", FILE_WRITE);
   File flightLogFile = SD.open("flight_log", FILE_WRITE);
+  File sensorLogFile = SD.open("sensor_log", FILE_WRITE);
 
 public:
   void setup();
@@ -42,6 +46,7 @@ public:
   void saveFlightStage();
   void setFlightStage(FlightStage flightStage);
   void writeLog(char *message);
+  void logData(SensorData sensorData, SensorData kalmanData);
   void logData(char *data);
 };
 

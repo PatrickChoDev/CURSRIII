@@ -67,7 +67,6 @@ void CURSRFilesystem::writeLog(char *message)
 
 void CURSRFilesystem::logData(char *data)
 {
-  log(data);
   // Get current timestamp
   time_t currentTime = time(nullptr);
 
@@ -77,6 +76,21 @@ void CURSRFilesystem::logData(char *data)
 
   // Write timestamp to flight log file
   flightLogFile.print(timestamp);
-  flightLogFile.print(" ");
+  flightLogFile.print(",");
   flightLogFile.println(data);
+}
+
+void CURSRFilesystem::logData(SensorData sensorData, SensorData kalmanData)
+{
+  // Get current timestamp
+  time_t currentTime = time(nullptr);
+  char timestamp[20];
+  strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&currentTime));
+  flightLogFile.print(timestamp);
+  flightLogFile.print(",raw_sensor_data,");
+  flightLogFile.println(String(sensorData.temperature) + "," + String(sensorData.pressure) + "," + String(sensorData.accelerationX) + "," + String(sensorData.accelerationY) + "," + String(sensorData.accelerationZ) + "," + String(sensorData.gyroscopeX) + "," + String(sensorData.gyroscopeY) + "," + String(sensorData.gyroscopeZ));
+  strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&currentTime));
+  flightLogFile.print(timestamp);
+  flightLogFile.print(",kalman_filtered_data,");
+  flightLogFile.println(String(kalmanData.temperature) + "," + String(kalmanData.pressure) + "," + String(kalmanData.accelerationX) + "," + String(kalmanData.accelerationY) + "," + String(kalmanData.accelerationZ) + "," + String(kalmanData.gyroscopeX) + "," + String(kalmanData.gyroscopeY) + "," + String(kalmanData.gyroscopeZ));
 }

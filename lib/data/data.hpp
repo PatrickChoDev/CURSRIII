@@ -45,7 +45,6 @@ private:
   SensorData kalmanData;
 
 public:
-  void init(SensorData *sensorData);
   SensorData getKalmanData();
   void setTemperature(float temp);
   void setPressure(float pres);
@@ -63,7 +62,6 @@ private:
 public:
   SensorData getRawSensorData();
   SensorData getKalmanFilteredData();
-  void init(SensorData sensorData);
   void setSensorData(SensorData sensorData);
   char *getEncodedSensorData();
   void decodeSensorData(char *encodedData);

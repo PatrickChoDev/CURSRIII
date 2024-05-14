@@ -1,24 +1,6 @@
 #include <data.hpp>
 
 /**
- * @brief Initializes the Kalman filter.
- *
- * This function initializes the Kalman filter with the sensor data.
- *
- * @param sensorData The sensor data to initialize the Kalman filter.
- */
-void KalmanFilterMetrics::init(SensorData *sensorData)
-{
-  Serial.println("Kalman filter initialized");
-  // temperature.set(sensorData->temperature);
-  // pressure.set(sensorData->pressure);
-  // float acc[3] = {sensorData->accelerationX, sensorData->accelerationY, sensorData->accelerationZ};
-  // acceleration.set(acc, 3);
-  // float gyro[3] = {sensorData->gyroscopeX, sensorData->gyroscopeY, sensorData->gyroscopeZ};
-  // gyroscope.set(gyro, 3);
-}
-
-/**
  * @brief Returns the Kalman filtered data.
  *
  * This function returns the Kalman filtered data.
@@ -99,17 +81,6 @@ void CURSRData::log(String message)
   {
     Serial.println(message);
   }
-}
-
-/**
- * @brief Constructor for the CURSRData class.
- *
- * This function initializes the CURSRData class.
- */
-void CURSRData::init(SensorData sensorData)
-{
-  kalmanFilterMetrics.init(&sensorData);
-  log("Data initialized");
 }
 
 /**
@@ -241,4 +212,43 @@ void CURSRData::setAccelerationZ(float accelerationZ)
 {
   sensorData.accelerationZ = accelerationZ;
   kalmanFilterMetrics.setAcceleration(sensorData.accelerationX, sensorData.accelerationY, accelerationZ);
+}
+
+/**
+ * @brief Sets the gyroscope in the X-axis.
+ *
+ * This function sets the gyroscope in the X-axis in the sensor data.
+ *
+ * @param gyroscopeX The gyroscope in the X-axis to be set.
+ */
+void CURSRData::setGyroscopeX(float gyroscopeX)
+{
+  sensorData.gyroscopeX = gyroscopeX;
+  kalmanFilterMetrics.setGyroscope(gyroscopeX, sensorData.gyroscopeY, sensorData.gyroscopeZ);
+}
+
+/**
+ * @brief Sets the gyroscope in the Y-axis.
+ *
+ * This function sets the gyroscope in the Y-axis in the sensor data.
+ *
+ * @param gyroscopeY The gyroscope in the Y-axis to be set.
+ */
+void CURSRData::setGyroscopeY(float gyroscopeY)
+{
+  sensorData.gyroscopeY = gyroscopeY;
+  kalmanFilterMetrics.setGyroscope(sensorData.gyroscopeX, gyroscopeY, sensorData.gyroscopeZ);
+}
+
+/**
+ * @brief Sets the gyroscope in the Z-axis.
+ *
+ * This function sets the gyroscope in the Z-axis in the sensor data.
+ *
+ * @param gyroscopeZ The gyroscope in the Z-axis to be set.
+ */
+void CURSRData::setGyroscopeZ(float gyroscopeZ)
+{
+  sensorData.gyroscopeZ = gyroscopeZ;
+  kalmanFilterMetrics.setGyroscope(sensorData.gyroscopeX, sensorData.gyroscopeY, gyroscopeZ);
 }
