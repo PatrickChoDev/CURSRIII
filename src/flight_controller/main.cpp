@@ -51,7 +51,7 @@ void flightThread(void *pvParameters)
   {
     Sensor.readSensor();
     Sensor.getSensorValue(&Data);
-    Filesystem.logData(Data.getRawSensorData(), Data.getKalmanFilteredData());
+    // Filesystem.logData(Data.getRawSensorData(), Data.getKalmanFilteredData());
   }
   return;
 }

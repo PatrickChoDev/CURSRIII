@@ -10,7 +10,7 @@ void CURSRFilesystem::log(char *message)
 void CURSRFilesystem::setup()
 {
   log("Setting up filesystem...");
-  SPI.begin(18, 16, 17, SD_CARD_SS_PIN);
+  SPI.begin(SD_CARD_SCK_PIN, SD_CARD_MISO_PIN, SD_CARD_MOSI_PIN, SD_CARD_SS_PIN);
   SPI.setDataMode(SPI_MODE0);
   if (SD.begin(SD_CARD_SS_PIN, SPI, 40000000, "/sd", 5U, true))
   {

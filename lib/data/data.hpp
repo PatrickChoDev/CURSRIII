@@ -18,6 +18,9 @@ struct SensorData
 {
   float temperature;
   float pressure;
+  float altitude;
+  float latitude;
+  float longitude;
   float accelerationX;
   float accelerationY;
   float accelerationZ;
@@ -29,10 +32,6 @@ struct SensorData
 class KalmanFilterMetrics
 {
 private:
-  float temperatureTime = millis() / 1000.f;
-  float pressureTime = millis() / 1000.f;
-  float accelerationTime = millis() / 1000.f;
-  float gyroscopeTime = millis() / 1000.f;
   SimpleKalmanFilter pressureKalmanFilter = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter temperature = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter pressure = SimpleKalmanFilter(1, 1, 0.01);
@@ -42,12 +41,14 @@ private:
   SimpleKalmanFilter gyroscopeX = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter gyroscopeY = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter gyroscopeZ = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter altitude = SimpleKalmanFilter(1, 1, 0.01);
   SensorData kalmanData;
 
 public:
   SensorData getKalmanData();
   void setTemperature(float temp);
   void setPressure(float pres);
+  void setAltitude(float alt);
   void setAcceleration(float accX, float accY, float accZ);
   void setGyroscope(float gyroX, float gyroY, float gyroZ);
 };
@@ -67,6 +68,9 @@ public:
   void decodeSensorData(char *encodedData);
   void setTemperature(float temperature);
   void setPressure(float pressure);
+  void setAltitude(float altitude);
+  void setLatitude(float latitude);
+  void setLongitude(float longitude);
   void setAccelerationX(float accelerationX);
   void setAccelerationY(float accelerationY);
   void setAccelerationZ(float accelerationZ);

@@ -16,9 +16,11 @@
 void CURSRSensor::setup()
 {
   log("Start sensor setup");
+  checkBNO055Sensor();
   checkBMP390Sensor();
   checkADXLSensor();
   checkMAXM10SSensor();
+  log("End sensor setup");
 }
 
 /**
@@ -62,25 +64,78 @@ void CURSRSensor::readSensor()
     accelZ = 0;
   }
 #endif
+  sensors_event_t event, linearAccelData, angVelData, orientationData, accelData;
 #if (ADXL375_ENABLED)
   if (ADXLAvailable)
   {
-    sensors_event_t event;
     accel.getEvent(&event);
+  }
+#endif
+#if (BNO055_ENABLED)
+  if (bnoAvailable)
+  {
+    bno.getEvent(&linearAccelData, Adafruit_BNO055::VECTOR_LINEARACCEL);
+    bno.getEvent(&angVelData, Adafruit_BNO055::VECTOR_GYROSCOPE);
+    bno.getEvent(&orientationData, Adafruit_BNO055::VECTOR_EULER);
+    bno.getEvent(&accelData, Adafruit_BNO055::VECTOR_ACCELEROMETER);
+  }
+#endif
+  // log("Accel value: " + String(event.acceleration.x) + ", " + String(event.acceleration.y) + ", " + String(event.acceleration.z) + "m/s^2");
+  // log("Linear accel value: " + String(accelData.acceleration.x) + ", " + String(accelData.acceleration.y) + ", " + String(accelData.acceleration.z) + "m/s^2");
+  // log("Orien value: " + String(orientationData.orientation.x) + ", " + String(orientationData.orientation.y) + ", " + String(orientationData.orientation.z) + "rad/s");
+
+  // log("Gyro value: " + String(angVelData.gyro.x) + ", " + String(angVelData.gyro.y) + ", " + String(angVelData.gyro.z) + "rad/s");
+  log("------------------------------------");
+#if (ADXL375_ENABLED || BNO055_ENABLED)
+  if (ADXLAvailable && bnoAvailable)
+  {
+    gyroX = (angVelData.gyro.x + event.gyro.x) / 2;
+    gyroY = (angVelData.gyro.y + event.gyro.y) / 2;
+    gyroZ = (angVelData.gyro.z + event.gyro.z) / 2;
+    accelX = (event.acceleration.x + accelData.acceleration.x) / 2;
+    accelY = (event.acceleration.y + accelData.acceleration.y) / 2;
+    accelZ = (event.acceleration.z + accelData.acceleration.z) / 2;
+  }
+  else if (ADXLAvailable)
+  {
     accelX = event.acceleration.x;
     accelY = event.acceleration.y;
     accelZ = event.acceleration.z;
-    log("Accel value: " + String(accelX) + ", " + String(accelY) + ", " + String(accelZ) + "m/s^2");
+    gyroX = event.gyro.x;
+    gyroY = event.gyro.y;
+    gyroZ = event.gyro.z;
   }
+#if (BNO055_ENABLED)
+  else if (bnoAvailable)
+  {
+    accelX = accelData.acceleration.x;
+    accelY = accelData.acceleration.y;
+    accelZ = accelData.acceleration.z;
+    gyroX = angVelData.gyro.x;
+    gyroY = angVelData.gyro.y;
+    gyroZ = angVelData.gyro.z;
+  }
+#endif
   else
   {
     accelX = 0;
     accelY = 0;
     accelZ = 0;
+    gyroX = 0;
+    gyroY = 0;
+    gyroZ = 0;
   }
 #endif
+  if (bnoAvailable || ADXLAvailable)
+  {
+    log("Accel value: " + String(accelX) + ", " + String(accelY) + ", " + String(accelZ) + "m/s^2");
+    if (ADXLAvailable)
+    {
+      // log("Gyro value: " + String(gyroX) + ", " + String(gyroY) + ", " + String(gyroZ) + "rad/s");
+    }
+  }
 #if (MAXM10S_ENABLED)
-  if (maxm10sAvailable && gnss.getPVT() == true)
+  if (maxm10sAvailable && gnss.getPVT(20))
   {
     int32_t latitude = gnss.getLatitude();
     Serial.print(F("Lat: "));
@@ -110,13 +165,15 @@ void CURSRSensor::readSensor()
  */
 void CURSRSensor::getSensorValue(CURSRData *data)
 {
-  // data->setAltitude(altitude);
-  // data->setAccelX(accelX);
-  // data->setAccelY(accelY);
-  // data->setAccelZ(accelZ);
+  data->setAltitude(altitude);
+  data->setAccelerationX(accelX);
+  data->setAccelerationY(accelY);
+  data->setAccelerationZ(accelZ);
+  data->setGyroscopeX(gyroX);
+  data->setGyroscopeY(gyroY);
+  data->setGyroscopeZ(gyroZ);
   data->setPressure(pressure);
   data->setTemperature(temperature);
-  Serial.println("Data set");
 }
 
 void CURSRSensor::setBMP390Available(bool available)

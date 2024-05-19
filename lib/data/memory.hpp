@@ -3,7 +3,19 @@
 #endif
 
 #ifndef SD_CARD_SS_PIN
-#define SD_CARD_SS_PIN 5
+#define SD_CARD_SS_PIN 27
+#endif
+
+#ifndef SD_CARD_MISO_PIN
+#define SD_CARD_MISO_PIN 26
+#endif
+
+#ifndef SD_CARD_MOSI_PIN
+#define SD_CARD_MOSI_PIN 13
+#endif
+
+#ifndef SD_CARD_SCK_PIN
+#define SD_CARD_SCK_PIN 14
 #endif
 
 #ifndef ARDUINO_H

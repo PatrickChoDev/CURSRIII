@@ -44,11 +44,11 @@
 #endif
 
 #ifndef LORA_RESET_PIN
-#define LORA_RESET_PIN 26
+#define LORA_RESET_PIN 17
 #endif
 
 #ifndef LORA_BUSY_PIN
-#define LORA_BUSY_PIN 27
+#define LORA_BUSY_PIN 16
 #endif
 
 #ifndef LORA_IRQ_PIN
@@ -56,15 +56,15 @@
 #endif
 
 #ifndef LORA_SCK
-#define LORA_SCK_PIN 14
+#define LORA_SCK_PIN 18
 #endif
 
 #ifndef LORA_MISO_PIN
-#define LORA_MISO_PIN 15
+#define LORA_MISO_PIN 19
 #endif
 
 #ifndef LORA_MOSI_PIN
-#define LORA_MOSI_PIN 13
+#define LORA_MOSI_PIN 23
 #endif
 
 #ifndef LORA_DIO3_VOLTAGE
@@ -76,7 +76,7 @@
 #endif
 
 #ifndef LORA_LISTEN_MODE
-#define LORA_LISTEN_MODE SX126X_RX_CONTINUOUS
+#define LORA_LISTEN_MODE SX126X_RX_SINGLE
 #endif
 
 #ifndef LORA_RX_GAIN

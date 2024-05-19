@@ -37,6 +37,18 @@ void KalmanFilterMetrics::setPressure(float pres)
 }
 
 /**
+ * @brief Sets the altitude.
+ *
+ * This function sets the altitude in the Kalman filter.
+ *
+ * @param alt The altitude to be set.
+ */
+void KalmanFilterMetrics::setAltitude(float alt)
+{
+  kalmanData.altitude = altitude.updateEstimate(alt);
+}
+
+/**
  * @brief Sets the acceleration.
  *
  * This function sets the acceleration in the Kalman filter.
@@ -173,6 +185,44 @@ void CURSRData::setPressure(float pressure)
 {
   sensorData.pressure = pressure;
   kalmanFilterMetrics.setPressure(pressure);
+}
+
+/**
+ * @brief Sets the altitude.
+ *
+ * This function sets the altitude in the sensor data.
+ *
+ * @param altitude The altitude to be set.
+ */
+void CURSRData::setAltitude(float altitude)
+{
+  sensorData.altitude = altitude;
+  kalmanFilterMetrics.setAltitude(altitude);
+}
+
+/**
+ * @brief Sets the latitude.
+ *
+ * This function sets the latitude in the sensor data.
+ *
+ * @param latitude The latitude to be set.
+ */
+void CURSRData::setLatitude(float latitude)
+{
+  sensorData.latitude = latitude;
+}
+
+/**
+ * @brief Sets the longitude.
+ *
+ * This function sets the longitude in the sensor data.
+ *
+ * @param longitude The longitude to be set.
+ */
+
+void CURSRData::setLongitude(float longitude)
+{
+  sensorData.longitude = longitude;
 }
 
 /**
