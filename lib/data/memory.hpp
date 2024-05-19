@@ -11,11 +11,11 @@
 #endif
 
 #ifndef SD_CARD_MOSI_PIN
-#define SD_CARD_MOSI_PIN 13
+#define SD_CARD_MOSI_PIN 33
 #endif
 
 #ifndef SD_CARD_SCK_PIN
-#define SD_CARD_SCK_PIN 14
+#define SD_CARD_SCK_PIN 25
 #endif
 
 #ifndef ARDUINO_H
@@ -45,8 +45,9 @@ class CURSRFilesystem
 {
 private:
   bool memoryAvailable = false;
-  void log(char *message);
+  SPIClass SDSPI;
   FlightStage flightStage = PRELAUNCH;
+  void log(char *message);
   File systemLogFile = SD.open("system_log", FILE_WRITE);
   File flightLogFile = SD.open("flight_log", FILE_WRITE);
   File sensorLogFile = SD.open("sensor_log", FILE_WRITE);

@@ -145,7 +145,8 @@ void CURSRData::setSensorData(SensorData sensorData)
 char *CURSRData::getEncodedSensorData()
 {
   char *encodedData = new char[sizeof(SensorData)];
-  memcpy(encodedData, &sensorData, sizeof(SensorData));
+  SensorData sense = this->getKalmanFilteredData();
+  memcpy(encodedData, &sense, sizeof(SensorData));
   return encodedData;
 }
 
@@ -207,7 +208,7 @@ void CURSRData::setAltitude(float altitude)
  *
  * @param latitude The latitude to be set.
  */
-void CURSRData::setLatitude(float latitude)
+void CURSRData::setLatitude(int32_t latitude)
 {
   sensorData.latitude = latitude;
 }
@@ -220,7 +221,7 @@ void CURSRData::setLatitude(float latitude)
  * @param longitude The longitude to be set.
  */
 
-void CURSRData::setLongitude(float longitude)
+void CURSRData::setLongitude(int32_t longitude)
 {
   sensorData.longitude = longitude;
 }

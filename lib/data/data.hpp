@@ -19,8 +19,8 @@ struct SensorData
   float temperature;
   float pressure;
   float altitude;
-  float latitude;
-  float longitude;
+  int32_t latitude;
+  int32_t longitude;
   float accelerationX;
   float accelerationY;
   float accelerationZ;
@@ -69,8 +69,8 @@ public:
   void setTemperature(float temperature);
   void setPressure(float pressure);
   void setAltitude(float altitude);
-  void setLatitude(float latitude);
-  void setLongitude(float longitude);
+  void setLatitude(int32_t latitude);
+  void setLongitude(int32_t longitude);
   void setAccelerationX(float accelerationX);
   void setAccelerationY(float accelerationY);
   void setAccelerationZ(float accelerationZ);

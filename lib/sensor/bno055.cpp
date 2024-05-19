@@ -8,7 +8,7 @@
 void CURSRSensor::checkBNO055Sensor()
 {
 #if (BNO055_ENABLED)
-  if (!bno.begin())
+  if (!bno.begin(adafruit_bno055_opmode_t::OPERATION_MODE_NDOF))
   {
     log("BNO055 sensor not found");
     bnoAvailable = false;
@@ -17,6 +17,7 @@ void CURSRSensor::checkBNO055Sensor()
   {
     log("BNO055 sensor found");
     bnoAvailable = true;
+    bno.printSensorDetails();
   }
 #endif
 }

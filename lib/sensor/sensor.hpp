@@ -46,6 +46,9 @@ private:
   float gyroX = 0;
   float gyroY = 0;
   float gyroZ = 0;
+  int32_t latitude = 0;
+  int32_t longitude = 0;
+  int32_t altitudeGPS = 0;
   void log(String message);
   void checkBMP390Sensor();
   void checkBNO055Sensor();

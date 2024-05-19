@@ -47,12 +47,9 @@ void CURSRSensor::readSensor()
 #if (BMP390_ENABLED)
   if (bmp390Available)
   {
-
     altitude = bmp.readAltitude(BMP390_SEE_LEVEL_PRESSURE);
     temperature = bmp.readTemperature();
     pressure = bmp.readPressure();
-
-    log("Sensor value: " + String(altitude) + "m, " + String(temperature) + "C, " + String(pressure) + "Pa");
   }
   else
   {
@@ -80,12 +77,6 @@ void CURSRSensor::readSensor()
     bno.getEvent(&accelData, Adafruit_BNO055::VECTOR_ACCELEROMETER);
   }
 #endif
-  // log("Accel value: " + String(event.acceleration.x) + ", " + String(event.acceleration.y) + ", " + String(event.acceleration.z) + "m/s^2");
-  // log("Linear accel value: " + String(accelData.acceleration.x) + ", " + String(accelData.acceleration.y) + ", " + String(accelData.acceleration.z) + "m/s^2");
-  // log("Orien value: " + String(orientationData.orientation.x) + ", " + String(orientationData.orientation.y) + ", " + String(orientationData.orientation.z) + "rad/s");
-
-  // log("Gyro value: " + String(angVelData.gyro.x) + ", " + String(angVelData.gyro.y) + ", " + String(angVelData.gyro.z) + "rad/s");
-  log("------------------------------------");
 #if (ADXL375_ENABLED || BNO055_ENABLED)
   if (ADXLAvailable && bnoAvailable)
   {
@@ -126,32 +117,13 @@ void CURSRSensor::readSensor()
     gyroZ = 0;
   }
 #endif
-  if (bnoAvailable || ADXLAvailable)
-  {
-    log("Accel value: " + String(accelX) + ", " + String(accelY) + ", " + String(accelZ) + "m/s^2");
-    if (ADXLAvailable)
-    {
-      // log("Gyro value: " + String(gyroX) + ", " + String(gyroY) + ", " + String(gyroZ) + "rad/s");
-    }
-  }
 #if (MAXM10S_ENABLED)
   if (maxm10sAvailable && gnss.getPVT(20))
   {
-    int32_t latitude = gnss.getLatitude();
-    Serial.print(F("Lat: "));
-    Serial.print(latitude);
-
-    int32_t longitude = gnss.getLongitude();
-    Serial.print(F(" Long: "));
-    Serial.print(longitude);
-    Serial.print(F(" (degrees * 10^-7)"));
-
-    int32_t altitude = gnss.getAltitudeMSL(); // Altitude above Mean Sea Level
-    Serial.print(F(" Alt: "));
-    Serial.print(altitude);
-    Serial.print(F(" (mm)"));
-
-    Serial.println();
+    latitude = gnss.getLatitude();
+    longitude = gnss.getLongitude();
+    altitudeGPS = gnss.getAltitudeMSL();
+    log("GPS value: " + String(latitude) + ", " + String(longitude) + ", " + String(altitudeGPS));
   }
 #endif
 }
@@ -174,6 +146,7 @@ void CURSRSensor::getSensorValue(CURSRData *data)
   data->setGyroscopeZ(gyroZ);
   data->setPressure(pressure);
   data->setTemperature(temperature);
+  data->setLatitude(latitude);
 }
 
 void CURSRSensor::setBMP390Available(bool available)

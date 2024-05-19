@@ -5,7 +5,7 @@ void CURSRRadio::loraSetup()
 {
   if (LORA_ENABLED)
   {
-    SPIClass LoRaSPI(HSPI);
+    SPIClass LoRaSPI(VSPI);
     LoRaSPI.begin(LORA_SCK_PIN, LORA_MISO_PIN, LORA_MOSI_PIN, LORA_NSS_PIN);
     LoRa.setSPI(LoRaSPI);
     while (!radioAvailable)
