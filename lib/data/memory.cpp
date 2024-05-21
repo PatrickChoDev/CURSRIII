@@ -23,6 +23,14 @@ void CURSRFilesystem::setup()
     this->memoryAvailable = false;
     log("Filesystem setup failed.");
   }
+  // YOU CAN ONLY OPEN ONE FILE AT A TIME
+  // systemLogFile.close();
+  File systemLogFile = SD.open("system_log.txt", FILE_WRITE);
+  systemLogFile.println("SETUP COMPLETE");
+  systemLogFile.println("AMOGUS");
+  systemLogFile.close();
+  // File flightLogFile = SD.open("flight_log", FILE_WRITE);
+  // File sensorLogFile = SD.open("sensor_log", FILE_WRITE);
 }
 
 FlightStage CURSRFilesystem::getFlightStage()
