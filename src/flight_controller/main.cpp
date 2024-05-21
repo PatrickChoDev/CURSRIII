@@ -20,17 +20,33 @@ void setup()
       1,
       NULL,
       1);
-  xTaskCreatePinnedToCore(
-      radioThread,
-      "Radio Thread",
-      10000,
-      NULL,
-      1,
-      NULL,
-      0);
+  // xTaskCreatePinnedToCore(
+  //     radioThread,
+  //     "Radio Thread",
+  //     10000,
+  //     NULL,
+  //     1,
+  //     NULL,
+  //     0);
 }
 
-void loop() {}
+void loop() {
+  Serial.printf(
+    "%f %f %f %d %d %f %f %f %f %f %f\n",
+    Data.getRawSensorData().temperature,
+    Data.getRawSensorData().pressure,
+    Data.getRawSensorData().altitude,
+    Data.getRawSensorData().latitude,
+    Data.getRawSensorData().longitude,
+    Data.getRawSensorData().accelerationX,
+    Data.getRawSensorData().accelerationY,
+    Data.getRawSensorData().accelerationZ,
+    Data.getRawSensorData().gyroscopeX,
+    Data.getRawSensorData().gyroscopeY,
+    Data.getRawSensorData().gyroscopeZ
+    );
+    delay(1000);
+}
 
 void radioThread(void *pvParameters)
 {

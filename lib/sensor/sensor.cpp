@@ -123,7 +123,7 @@ void CURSRSensor::readSensor()
     latitude = gnss.getLatitude();
     longitude = gnss.getLongitude();
     altitudeGPS = gnss.getAltitudeMSL();
-    log("GPS value: " + String(latitude) + ", " + String(longitude) + ", " + String(altitudeGPS));
+    // log("GPS value: " + String(latitude) + ", " + String(longitude) + ", " + String(altitudeGPS));
   }
 #endif
 }
@@ -147,6 +147,7 @@ void CURSRSensor::getSensorValue(CURSRData *data)
   data->setPressure(pressure);
   data->setTemperature(temperature);
   data->setLatitude(latitude);
+  data->setLongitude(longitude);
 }
 
 void CURSRSensor::setBMP390Available(bool available)
