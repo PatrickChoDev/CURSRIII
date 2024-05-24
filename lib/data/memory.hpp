@@ -7,11 +7,11 @@
 #endif
 
 #ifndef SD_CARD_MISO_PIN
-#define SD_CARD_MISO_PIN 12
+#define SD_CARD_MISO_PIN 27
 #endif
 
 #ifndef SD_CARD_MOSI_PIN
-#define SD_CARD_MOSI_PIN 13
+#define SD_CARD_MOSI_PIN 26
 #endif
 
 #ifndef SD_CARD_SCK_PIN
@@ -45,12 +45,12 @@ class CURSRFilesystem
 {
 private:
   bool memoryAvailable = false;
-  SPIClass SDSPI;
+  SPIClass *SDSPI = new SPIClass(HSPI);
   FlightStage flightStage = PRELAUNCH;
   void log(char *message);
-  File systemLogFile;
-  File flightLogFile;
-  File sensorLogFile;
+  const char* systemLogFilePath = "/systemLogFile.txt";
+  const char* flightLogFilePath = "/flightLogFile.txt";
+  const char* sensorLogFilePath = "/sensorLogFile,txt";
 
 public:
   void setup();
@@ -58,9 +58,10 @@ public:
   void loadFlightStage();
   void saveFlightStage();
   void setFlightStage(FlightStage flightStage);
-  void writeLog(char *message);
-  void logData(SensorData sensorData, SensorData kalmanData);
-  void logData(char *data);
+  void appendFile(const char * path, const char * message);
+  // void writeLog(char *message);
+  // void logData(SensorData sensorData, SensorData kalmanData);
+  // void logData(char *data);
 };
 
 #endif
