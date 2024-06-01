@@ -35,9 +35,9 @@ private:
   SimpleKalmanFilter pressureKalmanFilter = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter temperature = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter pressure = SimpleKalmanFilter(1, 1, 0.01);
-  SimpleKalmanFilter accelerationX = SimpleKalmanFilter(1, 1, 0.01);
-  SimpleKalmanFilter accelerationY = SimpleKalmanFilter(1, 1, 0.01);
-  SimpleKalmanFilter accelerationZ = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter accelerationX = SimpleKalmanFilter(1, 1, 0.1);
+  SimpleKalmanFilter accelerationY = SimpleKalmanFilter(1, 1, 0.1);
+  SimpleKalmanFilter accelerationZ = SimpleKalmanFilter(1, 1, 0.1);
   SimpleKalmanFilter gyroscopeX = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter gyroscopeY = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter gyroscopeZ = SimpleKalmanFilter(1, 1, 0.01);
@@ -65,6 +65,9 @@ public:
   SensorData getKalmanFilteredData();
   void setSensorData(SensorData sensorData);
   char *getEncodedSensorData();
+  char *getEncodedKalmanData();
+  char *getLogSensorData();
+  char *getLogKalmanData();
   void decodeSensorData(char *encodedData);
   void setTemperature(float temperature);
   void setPressure(float pressure);

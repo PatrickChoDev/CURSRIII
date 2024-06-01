@@ -151,6 +151,51 @@ char *CURSRData::getEncodedSensorData()
 }
 
 /**
+ * @brief Encodes the Kalman filtered data.
+ *
+ * This function encodes the Kalman filtered data into a byte array.
+ *
+ * @return The encoded Kalman filtered data.
+ */
+char *CURSRData::getEncodedKalmanData()
+{
+  char *encodedData = new char[sizeof(SensorData)];
+  SensorData sense = this->getKalmanFilteredData();
+  memcpy(encodedData, &sense, sizeof(SensorData));
+  return encodedData;
+}
+
+/**
+ * @brief Returns the sensor data in a log format.
+ *
+ * This function returns the sensor data in a log format.
+ *
+ * @return The sensor data in a log format.
+ */
+char *CURSRData::getLogSensorData()
+{
+  char *logData = new char[100];
+  SensorData sense = this->getRawSensorData();
+  sprintf(logData, "%f,%f,%f,%d,%d,%f,%f,%f,%f,%f,%f", sense.temperature, sense.pressure, sense.altitude, sense.latitude, sense.longitude, sense.accelerationX, sense.accelerationY, sense.accelerationZ, sense.gyroscopeX, sense.gyroscopeY, sense.gyroscopeZ);
+  return logData;
+}
+
+/**
+ * @brief Returns the Kalman filtered data in a log format.
+ *
+ * This function returns the Kalman filtered data in a log format.
+ *
+ * @return The Kalman filtered data in a log format.
+ */
+char *CURSRData::getLogKalmanData()
+{
+  char *logData = new char[100];
+  SensorData sense = this->getKalmanFilteredData();
+  sprintf(logData, "%f,%f,%f,%d,%d,%f,%f,%f,%f,%f,%f", sense.temperature, sense.pressure, sense.altitude, sense.latitude, sense.longitude, sense.accelerationX, sense.accelerationY, sense.accelerationZ, sense.gyroscopeX, sense.gyroscopeY, sense.gyroscopeZ);
+  return logData;
+}
+
+/**
  * @brief Decodes the sensor data.
  *
  * This function decodes the sensor data from a byte array.

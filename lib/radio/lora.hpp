@@ -8,11 +8,12 @@
 #endif
 
 #ifndef LORA_FREQUENCY
+// #define LORA_FREQUENCY 904300000
 #define LORA_FREQUENCY 915000000
 #endif
 
 #ifndef LORA_POWER
-#define LORA_POWER 22
+#define LORA_POWER 17
 #endif
 
 #ifndef LORA_BANDWIDTH
@@ -28,7 +29,7 @@
 #endif
 
 #ifndef LORA_PREAMBLE_LENGTH
-#define LORA_PREAMBLE_LENGTH 8
+#define LORA_PREAMBLE_LENGTH 4
 #endif
 
 #ifndef LORA_SYNC_WORD
@@ -44,11 +45,11 @@
 #endif
 
 #ifndef LORA_RESET_PIN
-#define LORA_RESET_PIN 17
+#define LORA_RESET_PIN 16
 #endif
 
 #ifndef LORA_BUSY_PIN
-#define LORA_BUSY_PIN 16
+#define LORA_BUSY_PIN 17
 #endif
 
 #ifndef LORA_IRQ_PIN
@@ -56,11 +57,11 @@
 #endif
 
 #ifndef LORA_SCK
-#define LORA_SCK_PIN 18
+#define LORA_SCK_PIN 19
 #endif
 
 #ifndef LORA_MISO_PIN
-#define LORA_MISO_PIN 19
+#define LORA_MISO_PIN 18
 #endif
 
 #ifndef LORA_MOSI_PIN
@@ -81,4 +82,12 @@
 
 #ifndef LORA_RX_GAIN
 #define LORA_RX_GAIN SX126X_RX_GAIN_BOOSTED
+#endif
+
+#ifndef LORA_PAYLOAD_LENGTH
+#define LORA_PAYLOAD_LENGTH 20
+#endif
+
+#ifndef LORA_CRC
+#define LORA_CRC true
 #endif

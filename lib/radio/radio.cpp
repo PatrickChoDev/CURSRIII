@@ -13,15 +13,10 @@ void CURSRRadio::send(char *data)
   if (radioAvailable)
   {
     LoRa.beginPacket();
-    LoRa.write(data, sizeof(data));
+    LoRa.write(data, strlen(data));
     LoRa.endPacket();
-    log("Data sent: " + String(data));
     LoRa.wait();
-    log("Transmission completed: " + String(LoRa.transmitTime()) + "ms");
-  }
-  else
-  {
-    log("Radio not available");
+    log("Data sent");
   }
 }
 

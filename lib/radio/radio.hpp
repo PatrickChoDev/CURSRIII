@@ -10,9 +10,11 @@
 #ifndef RADIO_HPP
 #define RADIO_HPP
 #include <lora.hpp>
+#include <SPI.h>
 class CURSRRadio
 {
 private:
+  SPIClass *LoRaSPI = new SPIClass(VSPI);
   SX126x LoRa;
   bool radioAvailable = false;
   char message[256];
