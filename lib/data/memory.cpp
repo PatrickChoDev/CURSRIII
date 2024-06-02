@@ -11,7 +11,7 @@ void CURSRFilesystem::setup()
   log("Setting up filesystem...\n");
   sprintf(systemLogFilePath, "/system_log_%s.csv", RUN_ID);
   sprintf(flightLogFilePath, "/flight_log_%s.csv", RUN_ID);
-  sprintf(flightStateFilePath, "/flight_log_%s.csv", RUN_ID);
+  sprintf(flightStateFilePath, "/flightstate_%s.e", RUN_ID);
   log("File paths set.\n");
   SDSPI->begin(SD_CARD_SCK_PIN, SD_CARD_MISO_PIN, SD_CARD_MOSI_PIN, SD_CARD_SS_PIN);
   if (SD.begin(SD_CARD_SS_PIN, *SDSPI))
@@ -122,6 +122,7 @@ void CURSRFilesystem::setFlightStage(FlightStage flightStage)
 {
   this->flightStage = flightStage;
   saveFlightStage();
+  this->logData(SensorData(), "FlightStage", "Flight stage changed to " + flightStage);
 }
 
 void CURSRFilesystem::appendFile(const char *path, const char *message)
@@ -151,13 +152,14 @@ void CURSRFilesystem::appendFile(const char *path, const char *message)
   file.close();
 }
 
-void CURSRFilesystem::logData(SensorData sensorData, char *tag = "", char *message = "")
+void CURSRFilesystem::logData(SensorData sensorData, const char *tag, const char *message)
 {
   // Get current timestamp
+  if (!memoryAvailable)
+    return;
   time_t currentTime = time(nullptr);
   char timestamp[20];
   strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&currentTime));
-  Serial.println(timestamp);
   File flightLogFile = SD.open(flightLogFilePath, FILE_APPEND);
   flightLogFile.print(timestamp);
   flightLogFile.print(",");
@@ -165,6 +167,6 @@ void CURSRFilesystem::logData(SensorData sensorData, char *tag = "", char *messa
   flightLogFile.print(",");
   flightLogFile.print(message);
   flightLogFile.print(",");
-  flightLogFile.println(String(sensorData.temperature) + "," + String(sensorData.pressure) + "," + String(sensorData.accelerationX) + "," + String(sensorData.accelerationY) + "," + String(sensorData.accelerationZ) + "," + String(sensorData.gyroscopeX) + "," + String(sensorData.gyroscopeY) + "," + String(sensorData.gyroscopeZ));
+  flightLogFile.printf("%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f\n", sensorData.temperature, sensorData.pressure, sensorData.accelerationX, sensorData.accelerationY, sensorData.accelerationZ, sensorData.gyroscopeX, sensorData.gyroscopeY, sensorData.gyroscopeZ);
   flightLogFile.close();
 }

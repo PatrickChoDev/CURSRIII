@@ -48,6 +48,7 @@ enum FlightStage
   FLIGHTSTAGE_COASTING,
   FLIGHTSTAGE_APOGEE,
   FLIGHTSTAGE_DESCENT,
+  FLIGHTSTAGE_LANDING,
   FLIGHTSTAGE_POSTFLIGHT
 };
 
@@ -68,7 +69,7 @@ public:
   void saveFlightStage();
   void setFlightStage(FlightStage flightStage);
   void appendFile(const char *path, const char *message);
-  void logData(SensorData data, char *tag, char *message);
+  void logData(SensorData data, const char *tag = "", const char *message = "");
 };
 
 #endif
