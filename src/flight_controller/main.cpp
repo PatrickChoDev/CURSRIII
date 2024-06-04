@@ -7,8 +7,10 @@ CURSRFilesystem Filesystem;
 
 TaskHandle_t flightTask;
 TaskHandle_t radioTask;
+TaskHandle_t recoveryRadioTask;
 
 void radioThread(void *pvParameters);
+void recoveryRadioThread(void *pvParameters);
 void flightThread(void *pvParameters);
 
 void setup()
@@ -34,7 +36,7 @@ void setup()
       "Radio Thread",
       10000,
       NULL,
-      tskIDLE_PRIORITY,
+      1,
       &radioTask,
       0);
 }
@@ -46,11 +48,11 @@ void loop()
 
 void radioThread(void *pvParameters)
 {
-  Radio.loraSetup();
+  Radio.setupTx();
   for (;;)
   {
     Radio.send(Data.getEncodedSensorData());
-    delay(1);
+    yield();
   }
   return;
 }
@@ -152,7 +154,14 @@ void flightThread(void *pvParameters)
       break;
     }
     pPressure = Data.getKalmanFilteredData().pressure;
-    Serial.println("Hi");
+    yield();
+  }
+}
+
+void recoveryRadioThread()
+{
+  for (;;)
+  {
     delay(1);
   }
 }

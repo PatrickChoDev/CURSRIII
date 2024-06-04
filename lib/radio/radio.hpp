@@ -21,7 +21,8 @@ private:
   uint8_t msgLen = 0;
 
 public:
-  void loraSetup();
+  void setupTx();
+  void setupRx();
   void send(char *data);
   void receive();
   char *getData();

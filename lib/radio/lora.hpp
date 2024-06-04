@@ -16,6 +16,10 @@
 #define LORA_POWER 17
 #endif
 
+#ifndef LORA_RX_POWER
+#define LORA_RX_POWER SX126X_RX_GAIN_BOOSTED
+#endif
+
 #ifndef LORA_BANDWIDTH
 #define LORA_BANDWIDTH SX126X_BW_125000
 #endif
