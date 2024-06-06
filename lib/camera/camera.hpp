@@ -3,32 +3,21 @@
 #include <Arduino.h>
 #endif
 
-#ifndef SOFTWARESERIAL_H
-#define SOFTWARESERIAL_H
-#include <SoftwareSerial.h>
-#endif
-
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
-class CURSRCamera
-{
-private:
-  int8_t TX_PIN;
-  int8_t RX_PIN;
-  uint32_t BAUD_RATE;
-  bool cameraAvailable = false;
-  uint8_t crc8(uint8_t *data, uint8_t len);
 
-public:
-  EspSoftwareSerial::UART cameraSerial;
-  void begin(int8_t txPin, int8_t rxPin, uint32_t baudRate);
-  void sendCommand(uint8_t *command, uint8_t len);
-  void write(uint8_t *data, uint8_t len = 1);
-  void flush();
-  uint8_t *readResponse();
-  size_t read(uint8_t *buffer, size_t len);
-  bool isAvailable();
-};
+void getDeviceInfo();
 
-uint8_t calculate_cr8x_fast(uint8_t *data, size_t len);
+void sendStartCommand();
+void sendStopCommand();
+void sendSwitchCommand();
+void sendPowerButton();
+void sendOSDCommand();
+
+void pressKeyCommand(uint8_t key);
+
+uint8_t crc8_calc(uint8_t crc, unsigned char a, uint8_t poly);
+
+uint8_t calcCrc(uint8_t *buf, uint8_t numBytes);
+
 #endif
