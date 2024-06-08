@@ -47,18 +47,9 @@ void CURSRSensor::readSensor()
 #if (BMP390_ENABLED)
   if (bmp390Available)
   {
-    altitude = bmp.readAltitude(BMP390_SEE_LEVEL_PRESSURE);
+    altitude = bmp.readAltitude(BMP390_SEA_LEVEL_PRESSURE);
     temperature = bmp.readTemperature();
     pressure = bmp.readPressure();
-  }
-  else
-  {
-    altitude = 0;
-    temperature = 0;
-    pressure = 0;
-    accelX = 0;
-    accelY = 0;
-    accelZ = 0;
   }
 #endif
   sensors_event_t event, linearAccelData, angVelData, orientationData, accelData;
@@ -107,23 +98,15 @@ void CURSRSensor::readSensor()
     gyroZ = angVelData.gyro.z;
   }
 #endif
-  else
-  {
-    accelX = 0;
-    accelY = 0;
-    accelZ = 0;
-    gyroX = 0;
-    gyroY = 0;
-    gyroZ = 0;
-  }
 #endif
 #if (MAXM10S_ENABLED)
-  if (maxm10sAvailable && gnss.getPVT(10))
+  if (!maxm10sAvailable)
+    checkMAXM10SSensor();
+  if (gnss.getPVT(5))
   {
-    latitude = gnss.getLatitude();
-    longitude = gnss.getLongitude();
-    altitudeGPS = gnss.getAltitudeMSL();
-    // log("GPS value: " + String(latitude) + ", " + String(longitude) + ", " + String(altitudeGPS));
+    latitude = gnss.getLatitude(5);
+    longitude = gnss.getLongitude(5);
+    altitudeGPS = gnss.getAltitudeMSL(10);
   }
 #endif
 }
@@ -148,6 +131,7 @@ void CURSRSensor::getSensorValue(CURSRData *data)
   data->setTemperature(temperature);
   data->setLatitude(latitude);
   data->setLongitude(longitude);
+  data->setAltitudeGPS(altitudeGPS);
 }
 
 void CURSRSensor::setBMP390Available(bool available)

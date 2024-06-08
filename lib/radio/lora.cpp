@@ -22,7 +22,7 @@ void CURSRRadio::setupTx()
       LoRa.setTxPower(LORA_POWER, SX126X_TX_POWER_SX1262);
       LoRa.setDio2RfSwitch(true);
       LoRa.setLoRaModulation(LORA_SPREADING_FACTOR, LORA_BANDWIDTH, LORA_CODING_RATE, true);
-      LoRa.setLoRaPacket(SX126X_HEADER_EXPLICIT, LORA_PREAMBLE_LENGTH, LORA_PAYLOAD_LENGTH, LORA_CRC);
+      LoRa.setLoRaPacket(LORA_HEADER_MODE, LORA_PREAMBLE_LENGTH, LORA_PAYLOAD_LENGTH, LORA_CRC);
       LoRa.setSyncWord(LORA_SYNC_WORD);
       radioAvailable = true;
       return;

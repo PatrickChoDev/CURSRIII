@@ -89,7 +89,11 @@
 #endif
 
 #ifndef LORA_PAYLOAD_LENGTH
-#define LORA_PAYLOAD_LENGTH 20
+#define LORA_PAYLOAD_LENGTH 24
+#endif
+
+#ifndef LORA_HEADER_MODE
+#define LORA_HEADER_MODE SX126X_HEADER_EXPLICIT
 #endif
 
 #ifndef LORA_CRC

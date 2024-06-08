@@ -15,7 +15,7 @@ void CURSRRadio::send(char *data)
     LoRa.beginPacket();
     LoRa.write(data, strlen(data));
     LoRa.endPacket();
-    LoRa.wait(10);
+    LoRa.wait();
   }
 }
 

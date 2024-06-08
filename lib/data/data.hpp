@@ -21,6 +21,7 @@ struct SensorData
   float altitude;
   int32_t latitude;
   int32_t longitude;
+  int32_t altitudeGPS;
   float accelerationX;
   float accelerationY;
   float accelerationZ;
@@ -32,9 +33,8 @@ struct SensorData
 class KalmanFilterMetrics
 {
 private:
-  SimpleKalmanFilter pressureKalmanFilter = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter temperature = SimpleKalmanFilter(1, 1, 0.01);
-  SimpleKalmanFilter pressure = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter pressure = SimpleKalmanFilter(1, 1, 0.03);
   SimpleKalmanFilter accelerationX = SimpleKalmanFilter(1, 1, 0.1);
   SimpleKalmanFilter accelerationY = SimpleKalmanFilter(1, 1, 0.1);
   SimpleKalmanFilter accelerationZ = SimpleKalmanFilter(1, 1, 0.1);
@@ -51,6 +51,9 @@ public:
   void setAltitude(float alt);
   void setAcceleration(float accX, float accY, float accZ);
   void setGyroscope(float gyroX, float gyroY, float gyroZ);
+  void setAltitudeGPS(int32_t alt);
+  void setLatitude(int32_t lat);
+  void setLongitude(int32_t lon);
 };
 
 class CURSRData
@@ -80,6 +83,7 @@ public:
   void setGyroscopeX(float gyroscopeX);
   void setGyroscopeY(float gyroscopeY);
   void setGyroscopeZ(float gyroscopeZ);
+  void setAltitudeGPS(int32_t altitudeGPS);
 };
 
 #endif

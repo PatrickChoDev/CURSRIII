@@ -44,7 +44,7 @@ void CURSRFilesystem::setup()
     {
       log("Flight log file does not exist.\n");
       File flightLogFile = SD.open(flightLogFilePath, FILE_WRITE);
-      flightLogFile.print("Timestamp,Tag,Message,Temperature,Pressure,AccelerationX,AccelerationY,AccelerationZ,GyroscopeX,GyroscopeY,GyroscopeZ\n");
+      flightLogFile.print("Timestamp,Tag,Message,Temperature,Pressure,Altitude,GPSAltitude,Latitude,Longitude,AccelerationX,AccelerationY,AccelerationZ,GyroscopeX,GyroscopeY,GyroscopeZ\n");
       flightLogFile.close();
     }
 
@@ -122,7 +122,6 @@ void CURSRFilesystem::setFlightStage(FlightStage flightStage)
 {
   this->flightStage = flightStage;
   saveFlightStage();
-  this->logData(SensorData(), "FlightStage", "Flight stage changed to " + flightStage);
 }
 
 void CURSRFilesystem::appendFile(const char *path, const char *message)
@@ -167,7 +166,7 @@ void CURSRFilesystem::logData(SensorData sensorData, const char *tag, const char
   flightLogFile.print(",");
   flightLogFile.print(message);
   flightLogFile.print(",");
-  flightLogFile.printf("%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f\n", sensorData.temperature, sensorData.pressure, sensorData.accelerationX, sensorData.accelerationY, sensorData.accelerationZ, sensorData.gyroscopeX, sensorData.gyroscopeY, sensorData.gyroscopeZ);
+  flightLogFile.printf("%.4f,%.4f,%.4f,%.4f,%d,%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f\n", sensorData.temperature, sensorData.pressure, sensorData.altitude, sensorData.altitudeGPS, sensorData.latitude, sensorData.longitude, sensorData.accelerationX, sensorData.accelerationY, sensorData.accelerationZ, sensorData.gyroscopeX, sensorData.gyroscopeY, sensorData.gyroscopeZ);
   flightLogFile.close();
 }
 
@@ -184,5 +183,6 @@ void CURSRFilesystem::systemLog(const char *tag, const char *message)
   flightLogFile.print(tag);
   flightLogFile.print(",");
   flightLogFile.print(message);
+  flightLogFile.println();
   flightLogFile.close();
 }

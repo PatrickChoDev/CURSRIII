@@ -15,7 +15,7 @@
 #define MAIN_PARACHUTE_HIGH_DELAY 1000
 
 // RUN_ID is a unique identifier for the flight. It is used to name the log files
-#define RUN_ID 4
+#define RUN_ID 0
 #define RESET_FLIGHT false
 
 // #define PRELAUNCH_DELAY 10000

@@ -17,7 +17,7 @@ void setup()
 {
   Wire.end();
   Wire.setPins(33, 32);
-  Wire.begin(33, 32, 4000000U);
+  Wire.begin(33, 32);
   Serial.begin(115200);
   Sensor.setup();
   Filesystem.setup();
@@ -37,7 +37,7 @@ void setup()
       "Radio Thread",
       10000,
       NULL,
-      tskIDLE_PRIORITY,
+      tskIDLE_PRIORITY + 1,
       &radioTask,
       1);
 }
@@ -48,21 +48,17 @@ void loop()
 
 void radioThread(void *pvParameters)
 {
-  Radio.setupTx();
   Filesystem.systemLog("lora", "lora ready");
   for (;;)
   {
-    Radio.send(Data.getEncodedSensorData());
-    Filesystem.systemLog("lora", "sent data");
-    delay(1000);
+    Radio.send(Data.getEncodedKalmanData());
+    delay(100);
   }
   return;
 }
 
 void flightThread(void *pvParameters)
 {
-  Filesystem.setup();
-  Sensor.setup();
   Filesystem.systemLog("sensor", "setup finished");
   unsigned long startTime = millis();
   float maxRMS = -10;
@@ -73,9 +69,6 @@ void flightThread(void *pvParameters)
     Sensor.getSensorValue(&Data);
     Filesystem.logData(Data.getRawSensorData(), "raw");
     Filesystem.logData(Data.getKalmanFilteredData(), "kalman");
-    Filesystem.systemLog("sensor", "interate");
-    Serial.print("Flightstage: " + String(Filesystem.getFlightStage()) + "\n\r");
-    // Serial.println("Acceleration: " + String(Data.getKalmanFilteredData().accelerationX) + " " + String(Data.getKalmanFilteredData().accelerationY) + " " + String(Data.getKalmanFilteredData().accelerationZ));
     float rms = sqrt(pow(Data.getKalmanFilteredData().accelerationX, 2) + pow(Data.getKalmanFilteredData().accelerationY, 2) + pow(Data.getKalmanFilteredData().accelerationZ, 2));
     switch (Filesystem.getFlightStage())
     {
@@ -156,9 +149,17 @@ void flightThread(void *pvParameters)
       Filesystem.logData(Data.getRawSensorData(), "raw", "postflight");
       if (millis() - startTime > POSTFLIGHT_DELAY && abs(Data.getKalmanFilteredData().pressure - pPressure) > 0.1 * pPressure)
       {
+        vTaskDelete(&radioTask);
         Filesystem.systemLog("flight", "removing task");
-        // vTaskDelete(&radioTask);
         // TODO Add new task to send GPS data to ground station
+        xTaskCreatePinnedToCore(
+            recoveryRadioThread,
+            "Recovery Radio Thread",
+            10000,
+            NULL,
+            tskIDLE_PRIORITY + 1,
+            &recoveryRadioTask,
+            1);
         vTaskDelete(&flightTask);
       }
       break;
@@ -170,11 +171,12 @@ void flightThread(void *pvParameters)
   }
 }
 
-void recoveryRadioThread()
+void recoveryRadioThread(void *pvParameters)
 {
   Filesystem.systemLog("recover", "setup recover radio");
   for (;;)
   {
-    delay(1);
+    Radio.send("recover");
+    delay(100);
   }
 }

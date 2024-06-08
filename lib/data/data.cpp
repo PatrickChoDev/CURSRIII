@@ -81,6 +81,42 @@ void KalmanFilterMetrics::setGyroscope(float gyroX, float gyroY, float gyroZ)
 }
 
 /**
+ * @brief Sets the GPS altitude.
+ *
+ * This function sets the GPS altitude in the Kalman filter.
+ *
+ * @param alt The GPS altitude to be set.
+ */
+void KalmanFilterMetrics::setAltitudeGPS(int32_t alt)
+{
+  kalmanData.altitudeGPS = alt;
+}
+
+/**
+ * @brief Sets the latitude.
+ *
+ * This function sets the latitude in the Kalman filter.
+ *
+ * @param lat The latitude to be set.
+ */
+void KalmanFilterMetrics::setLatitude(int32_t lat)
+{
+  kalmanData.latitude = lat;
+}
+
+/**
+ * @brief Sets the longitude.
+ *
+ * This function sets the longitude in the Kalman filter.
+ *
+ * @param lon The longitude to be set.
+ */
+void KalmanFilterMetrics::setLongitude(int32_t lon)
+{
+  kalmanData.longitude = lon;
+}
+
+/**
  * @brief Logs a message to the Serial.
  *
  * This function logs a message to the Serial if the DATA_LOG_ENABLED is enabled.
@@ -145,7 +181,7 @@ void CURSRData::setSensorData(SensorData sensorData)
 char *CURSRData::getEncodedSensorData()
 {
   char *encodedData = new char[sizeof(SensorData)];
-  SensorData sense = this->getKalmanFilteredData();
+  SensorData sense = this->getRawSensorData();
   memcpy(encodedData, &sense, sizeof(SensorData));
   return encodedData;
 }
@@ -161,6 +197,10 @@ char *CURSRData::getEncodedKalmanData()
 {
   char *encodedData = new char[sizeof(SensorData)];
   SensorData sense = this->getKalmanFilteredData();
+  SensorData rawSense = this->getRawSensorData();
+  sense.altitudeGPS = rawSense.altitudeGPS;
+  sense.latitude = rawSense.latitude;
+  sense.longitude = rawSense.longitude;
   memcpy(encodedData, &sense, sizeof(SensorData));
   return encodedData;
 }
@@ -347,4 +387,16 @@ void CURSRData::setGyroscopeZ(float gyroscopeZ)
 {
   sensorData.gyroscopeZ = gyroscopeZ;
   kalmanFilterMetrics.setGyroscope(sensorData.gyroscopeX, sensorData.gyroscopeY, gyroscopeZ);
+}
+
+/**
+ * @brief Sets the GPS altitude.
+ *
+ * This function sets the GPS altitude in the sensor data.
+ *
+ * @param altitudeGPS The GPS altitude to be set.
+ */
+void CURSRData::setAltitudeGPS(int32_t altitudeGPS)
+{
+  sensorData.altitudeGPS = altitudeGPS;
 }

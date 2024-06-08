@@ -29,7 +29,7 @@
 #endif
 
 #ifndef RUN_ID
-#define RUN_ID 4
+#define RUN_ID 0
 #endif
 
 #ifndef RESET_FLIGHT

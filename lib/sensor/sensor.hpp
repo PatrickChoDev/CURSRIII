@@ -37,6 +37,7 @@ private:
   bool bmp390Available = false;
   bool ADXLAvailable = false;
   bool bnoAvailable = false;
+  bool maxm10sAvailable = false;
   float temperature = 0;
   float pressure = 0;
   float altitude = 0;
@@ -54,7 +55,6 @@ private:
   void checkBNO055Sensor();
   void checkADXLSensor();
   void checkMAXM10SSensor();
-  bool maxm10sAvailable = false;
 
 public:
   void setup();
