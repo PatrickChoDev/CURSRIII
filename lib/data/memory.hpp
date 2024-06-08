@@ -29,7 +29,7 @@
 #endif
 
 #ifndef RUN_ID
-#define RUN_ID "0"
+#define RUN_ID 4
 #endif
 
 #ifndef RESET_FLIGHT
@@ -70,6 +70,7 @@ public:
   void setFlightStage(FlightStage flightStage);
   void appendFile(const char *path, const char *message);
   void logData(SensorData data, const char *tag = "", const char *message = "");
+  void systemLog(const char *tag = "", const char *message = "");
 };
 
 #endif

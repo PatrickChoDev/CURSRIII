@@ -15,44 +15,46 @@ void flightThread(void *pvParameters);
 
 void setup()
 {
-  Wire.begin(33, 32);
-  Wire.setClock(400000);
+  Wire.end();
+  Wire.setPins(33, 32);
+  Wire.begin(33, 32, 4000000U);
   Serial.begin(115200);
-  // Sensor.setup();
-  // Filesystem.setup();
-  // Radio.loraSetup();
+  Sensor.setup();
+  Filesystem.setup();
+  Radio.setupTx();
   delay(1000);
   xTaskCreatePinnedToCore(
       flightThread,
       "Flight Thread",
       10000,
       NULL,
-      1,
+      tskIDLE_PRIORITY + 1,
       &flightTask,
-      1);
+      0);
   delay(3000);
   xTaskCreatePinnedToCore(
       radioThread,
       "Radio Thread",
       10000,
       NULL,
-      1,
+      tskIDLE_PRIORITY,
       &radioTask,
-      0);
+      1);
 }
 
 void loop()
 {
-  yield();
 }
 
 void radioThread(void *pvParameters)
 {
   Radio.setupTx();
+  Filesystem.systemLog("lora", "lora ready");
   for (;;)
   {
     Radio.send(Data.getEncodedSensorData());
-    yield();
+    Filesystem.systemLog("lora", "sent data");
+    delay(1000);
   }
   return;
 }
@@ -61,6 +63,7 @@ void flightThread(void *pvParameters)
 {
   Filesystem.setup();
   Sensor.setup();
+  Filesystem.systemLog("sensor", "setup finished");
   unsigned long startTime = millis();
   float maxRMS = -10;
   float pPressure = 0;
@@ -70,15 +73,17 @@ void flightThread(void *pvParameters)
     Sensor.getSensorValue(&Data);
     Filesystem.logData(Data.getRawSensorData(), "raw");
     Filesystem.logData(Data.getKalmanFilteredData(), "kalman");
-    Serial.print("Flightstage: " + String(Filesystem.getFlightStage()) + " MaxRMS: " + maxRMS + " RMS: " + sqrt(pow(Data.getKalmanFilteredData().accelerationX, 2) + pow(Data.getKalmanFilteredData().accelerationY, 2) + pow(Data.getKalmanFilteredData().accelerationZ, 2)) + " Pressure: " + Data.getKalmanFilteredData().pressure + " Altitude: " + Data.getKalmanFilteredData().altitude + " Time: " + millis() + " StartTime: " + startTime + " pPressure: " + pPressure + " ");
-    Serial.println("Acceleration: " + String(Data.getKalmanFilteredData().accelerationX) + " " + String(Data.getKalmanFilteredData().accelerationY) + " " + String(Data.getKalmanFilteredData().accelerationZ));
+    Filesystem.systemLog("sensor", "interate");
+    Serial.print("Flightstage: " + String(Filesystem.getFlightStage()) + "\n\r");
+    // Serial.println("Acceleration: " + String(Data.getKalmanFilteredData().accelerationX) + " " + String(Data.getKalmanFilteredData().accelerationY) + " " + String(Data.getKalmanFilteredData().accelerationZ));
     float rms = sqrt(pow(Data.getKalmanFilteredData().accelerationX, 2) + pow(Data.getKalmanFilteredData().accelerationY, 2) + pow(Data.getKalmanFilteredData().accelerationZ, 2));
     switch (Filesystem.getFlightStage())
     {
     case FLIGHTSTAGE_PRELAUNCH: // Stage 0
-      if (millis() - startTime > PRELAUNCH_DELAY && Data.getKalmanFilteredData().accelerationX > 2)
+      if (millis() - startTime > PRELAUNCH_DELAY && Data.getKalmanFilteredData().accelerationZ < -2)
       {
         startTime = millis();
+        Filesystem.systemLog("flight", "stage set to BURNOUT");
         Filesystem.setFlightStage(FLIGHTSTAGE_BURNOUT);
       }
       break;
@@ -88,6 +93,7 @@ void flightThread(void *pvParameters)
       {
         if (startTime > BURNOUT_DELAY)
         {
+          Filesystem.systemLog("flight", "stage set to COASTING");
           Filesystem.setFlightStage(FLIGHTSTAGE_COASTING);
         }
       }
@@ -99,10 +105,12 @@ void flightThread(void *pvParameters)
       break;
 
     case FLIGHTSTAGE_COASTING: // Stage 2
-      if (Data.getKalmanFilteredData().pressure > pPressure && Data.getKalmanFilteredData().pressure < APOGEE_PRESSURE_THRESHOLD && rms < APOGEE_ACCELERATION_THRESHOLD)
+                               // if (Data.getKalmanFilteredData().pressure > pPressure && Data.getKalmanFilteredData().pressure < APOGEE_PRESSURE_THRESHOLD && rms < APOGEE_ACCELERATION_THRESHOLD)
+      if (Data.getKalmanFilteredData().pressure > pPressure)
       {
         if (startTime > COASTING_DELAY)
         {
+          Filesystem.systemLog("flight", "stage set to APOGEE");
           Filesystem.setFlightStage(FLIGHTSTAGE_APOGEE);
         }
         startTime = millis();
@@ -113,6 +121,7 @@ void flightThread(void *pvParameters)
     case FLIGHTSTAGE_APOGEE: // Stage 3
       // TODO Eject parachute
       digitalWrite(DROUGE_PARACHUTE_EJECTION_PIN, HIGH);
+      Filesystem.systemLog("flight", "stage set to DESCENT");
       Filesystem.setFlightStage(FLIGHTSTAGE_DESCENT);
       startTime = millis();
       break;
@@ -123,6 +132,7 @@ void flightThread(void *pvParameters)
       if (Data.getKalmanFilteredData().altitude < 400)
       {
         digitalWrite(MAIN_PARACHUTE_EJECTION_PIN, HIGH);
+        Filesystem.systemLog("flight", "stage set to LANDING");
         Filesystem.setFlightStage(FLIGHTSTAGE_LANDING);
         startTime = millis();
         break;
@@ -134,6 +144,7 @@ void flightThread(void *pvParameters)
         digitalWrite(MAIN_PARACHUTE_EJECTION_PIN, LOW);
       if (rms > POSTFLIGHT_ACCELERATION_THRESHOLD)
       {
+        Filesystem.systemLog("flight", "stage set to POSTFLIGHT");
         Filesystem.setFlightStage(FLIGHTSTAGE_POSTFLIGHT);
         startTime = millis();
         break;
@@ -145,6 +156,7 @@ void flightThread(void *pvParameters)
       Filesystem.logData(Data.getRawSensorData(), "raw", "postflight");
       if (millis() - startTime > POSTFLIGHT_DELAY && abs(Data.getKalmanFilteredData().pressure - pPressure) > 0.1 * pPressure)
       {
+        Filesystem.systemLog("flight", "removing task");
         // vTaskDelete(&radioTask);
         // TODO Add new task to send GPS data to ground station
         vTaskDelete(&flightTask);
@@ -154,12 +166,13 @@ void flightThread(void *pvParameters)
       break;
     }
     pPressure = Data.getKalmanFilteredData().pressure;
-    yield();
+    delay(1);
   }
 }
 
 void recoveryRadioThread()
 {
+  Filesystem.systemLog("recover", "setup recover radio");
   for (;;)
   {
     delay(1);

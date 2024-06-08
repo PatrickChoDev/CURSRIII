@@ -80,11 +80,11 @@ void CURSRSensor::readSensor()
 #if (ADXL375_ENABLED || BNO055_ENABLED)
   if (ADXLAvailable && bnoAvailable)
   {
-    gyroX = (angVelData.gyro.x - event.gyro.y) / 2;
-    gyroY = (angVelData.gyro.y + event.gyro.x) / 2;
+    gyroX = (angVelData.gyro.x + event.gyro.x) / 2;
+    gyroY = (angVelData.gyro.y + event.gyro.y) / 2;
     gyroZ = (angVelData.gyro.z + event.gyro.z) / 2;
-    accelX = (event.acceleration.x - accelData.acceleration.y) / 2;
-    accelY = (event.acceleration.y + accelData.acceleration.x) / 2;
+    accelX = (event.acceleration.x + accelData.acceleration.x) / 2;
+    accelY = (event.acceleration.y + accelData.acceleration.y) / 2;
     accelZ = (event.acceleration.z + accelData.acceleration.z) / 2;
   }
   else if (ADXLAvailable)
@@ -99,11 +99,11 @@ void CURSRSensor::readSensor()
 #if (BNO055_ENABLED)
   else if (bnoAvailable)
   {
-    accelX = -accelData.acceleration.y;
-    accelY = accelData.acceleration.x;
+    accelX = accelData.acceleration.x;
+    accelY = accelData.acceleration.y;
     accelZ = accelData.acceleration.z;
-    gyroX = -angVelData.gyro.y;
-    gyroY = angVelData.gyro.x;
+    gyroX = angVelData.gyro.x;
+    gyroY = angVelData.gyro.y;
     gyroZ = angVelData.gyro.z;
   }
 #endif

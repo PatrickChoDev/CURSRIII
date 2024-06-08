@@ -57,10 +57,6 @@ private:
   bool maxm10sAvailable = false;
 
 public:
-  CURSRSensor()
-  {
-    log("Sensor created");
-  };
   void setup();
   void readSensor();
   void getSensorValue(CURSRData *data);

@@ -61,11 +61,11 @@
 #endif
 
 #ifndef LORA_SCK
-#define LORA_SCK_PIN 19
+#define LORA_SCK_PIN 18
 #endif
 
 #ifndef LORA_MISO_PIN
-#define LORA_MISO_PIN 18
+#define LORA_MISO_PIN 19
 #endif
 
 #ifndef LORA_MOSI_PIN
