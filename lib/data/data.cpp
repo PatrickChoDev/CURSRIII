@@ -206,23 +206,6 @@ char *CURSRData::getEncodedKalmanData()
 }
 
 /**
- * @brief Encodes the location data.
- *
- * This function encodes the location data into a byte array.
- *
- * @return The encoded location data.
- */
-char *CURSRData::getEncodedLocationData()
-{
-  char *encodedData = new char[sizeof(SensorData)];
-  sense.altitudeGPS = this->getRawSensorData().altitudeGPS;
-  sense.latitude = this->getRawSensorData().latitude;
-  sense.longitude = this->getRawSensorData().longitude;
-  memcpy(encodedData, &sense, sizeof(SensorData));
-  return encodedData;
-}
-
-/**
  * @brief Returns the sensor data in a log format.
  *
  * This function returns the sensor data in a log format.

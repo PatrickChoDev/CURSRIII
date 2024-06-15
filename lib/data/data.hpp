@@ -80,7 +80,6 @@ public:
   char *getEncodedKalmanData();
   char *getLogSensorData();
   char *getLogKalmanData();
-  char *getEncodedLocationData();
   void decodeSensorData(char *encodedData);
   void setTemperature(float temperature);
   void setPressure(float pressure);
