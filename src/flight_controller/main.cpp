@@ -55,7 +55,7 @@ void radioThread(void *pvParameters)
     packet.altitudeGPS = Data.getRawSensorData().altitudeGPS;
     packet.altitude = Data.getKalmanFilteredData().altitude;
     packet.flightStage = Filesystem.getFlightStage();
-    char *packetData = (char *)&packet;
+    char *packetData = new char[sizeof(packet)];
     memccpy(packetData, &packet, sizeof(packet), sizeof(packet));
     Radio.send(packetData);
     delay(50);
