@@ -30,6 +30,15 @@ struct SensorData
   float gyroscopeZ;
 };
 
+struct RadioPacket
+{
+  int32_t latitude;
+  int32_t longitude;
+  int32_t altitudeGPS;
+  float altitude;
+  int flightStage;
+};
+
 class KalmanFilterMetrics
 {
 private:
@@ -71,6 +80,7 @@ public:
   char *getEncodedKalmanData();
   char *getLogSensorData();
   char *getLogKalmanData();
+  char *getEncodedLocationData();
   void decodeSensorData(char *encodedData);
   void setTemperature(float temperature);
   void setPressure(float pressure);

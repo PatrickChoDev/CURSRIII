@@ -7,10 +7,8 @@ CURSRFilesystem Filesystem;
 
 TaskHandle_t flightTask;
 TaskHandle_t radioTask;
-TaskHandle_t recoveryRadioTask;
 
 void radioThread(void *pvParameters);
-void recoveryRadioThread(void *pvParameters);
 void flightThread(void *pvParameters);
 
 void setup()
@@ -51,8 +49,16 @@ void radioThread(void *pvParameters)
   Filesystem.systemLog("lora", "lora ready");
   for (;;)
   {
-    Radio.send(Data.getEncodedKalmanData());
-    delay(100);
+    RadioPacket packet;
+    packet.latitude = Data.getRawSensorData().latitude;
+    packet.longitude = Data.getRawSensorData().longitude;
+    packet.altitudeGPS = Data.getRawSensorData().altitudeGPS;
+    packet.altitude = Data.getKalmanFilteredData().altitude;
+    packet.flightStage = Filesystem.getFlightStage();
+    char *packetData = (char *)&packet;
+    memccpy(packetData, &packet, sizeof(packet), sizeof(packet));
+    Radio.send(packetData);
+    delay(50);
   }
   return;
 }
@@ -149,18 +155,7 @@ void flightThread(void *pvParameters)
       Filesystem.logData(Data.getRawSensorData(), "raw", "postflight");
       if (millis() - startTime > POSTFLIGHT_DELAY && abs(Data.getKalmanFilteredData().pressure - pPressure) > 0.1 * pPressure)
       {
-        vTaskDelete(&radioTask);
-        Filesystem.systemLog("flight", "removing task");
-        // TODO Add new task to send GPS data to ground station
-        xTaskCreatePinnedToCore(
-            recoveryRadioThread,
-            "Recovery Radio Thread",
-            10000,
-            NULL,
-            tskIDLE_PRIORITY + 1,
-            &recoveryRadioTask,
-            1);
-        vTaskDelete(&flightTask);
+        vTaskDelete(flightTask);
       }
       break;
     default:
@@ -168,15 +163,5 @@ void flightThread(void *pvParameters)
     }
     pPressure = Data.getKalmanFilteredData().pressure;
     delay(1);
-  }
-}
-
-void recoveryRadioThread(void *pvParameters)
-{
-  Filesystem.systemLog("recover", "setup recover radio");
-  for (;;)
-  {
-    Radio.send("recover");
-    delay(100);
   }
 }

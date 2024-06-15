@@ -14,6 +14,8 @@ void sendSwitchCommand();
 void sendPowerButton();
 void sendOSDCommand();
 
+void switchUARTTo(uint8_t uart);
+void switchVideoTo(uint8_t video);
 void pressKeyCommand(uint8_t key);
 
 uint8_t crc8_calc(uint8_t crc, unsigned char a, uint8_t poly);

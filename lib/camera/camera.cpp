@@ -118,3 +118,53 @@ void sendOSDCommand()
   Serial1.write(txBuf, 4);
   Serial.println("Sent OSD command");
 }
+
+void switchUARTTo(uint8_t mode)
+{
+  if (mode == 1)
+  {
+    digitalWrite(33, LOW);
+    digitalWrite(25, LOW);
+  }
+  else if (mode == 2)
+  {
+    digitalWrite(33, HIGH);
+    digitalWrite(25, LOW);
+  }
+  else if (mode == 3)
+  {
+    digitalWrite(33, LOW);
+    digitalWrite(25, HIGH);
+  }
+  else if (mode == 4)
+  {
+    digitalWrite(33, HIGH);
+    digitalWrite(25, HIGH);
+  }
+  Serial.printf("Switched to UART %d\n", mode);
+}
+
+void switchVideoTo(uint8_t mode)
+{
+  if (mode == 1)
+  {
+    digitalWrite(26, LOW);
+    digitalWrite(27, LOW);
+  }
+  else if (mode == 2)
+  {
+    digitalWrite(26, HIGH);
+    digitalWrite(27, LOW);
+  }
+  else if (mode == 3)
+  {
+    digitalWrite(26, LOW);
+    digitalWrite(27, HIGH);
+  }
+  else if (mode == 4)
+  {
+    digitalWrite(26, HIGH);
+    digitalWrite(27, HIGH);
+  }
+  Serial.printf("Switched to video channel %d\n", mode);
+}
