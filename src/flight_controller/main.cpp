@@ -20,7 +20,6 @@ void setup()
   Sensor.setup();
   Filesystem.setup();
   Radio.setupTx();
-  delay(1000);
   xTaskCreatePinnedToCore(
       flightThread,
       "Flight Thread",
@@ -29,7 +28,7 @@ void setup()
       tskIDLE_PRIORITY + 1,
       &flightTask,
       0);
-  delay(3000);
+  delay(500);
   xTaskCreatePinnedToCore(
       radioThread,
       "Radio Thread",
@@ -49,42 +48,43 @@ void radioThread(void *pvParameters)
   Filesystem.systemLog("lora", "lora ready");
   for (;;)
   {
-    RadioPacket packet;
-    packet.latitude = Data.getRawSensorData().latitude;
-    packet.longitude = Data.getRawSensorData().longitude;
-    packet.altitudeGPS = Data.getRawSensorData().altitudeGPS;
-    packet.altitude = Data.getKalmanFilteredData().altitude;
-    packet.flightStage = Filesystem.getFlightStage();
-    char *packetData = new char[sizeof(packet)];
-    memccpy(packetData, &packet, sizeof(packet), sizeof(packet));
-    Radio.send(packetData);
-    delay(50);
+    Radio.send(Data.getEncodedSensorData());
+    delay(Filesystem.getFlightStage() == FLIGHTSTAGE_PRELAUNCH ? 1500 : 50);
   }
   return;
 }
 
 void flightThread(void *pvParameters)
 {
+  int decay_log = 0;
   Filesystem.systemLog("sensor", "setup finished");
   unsigned long startTime = millis();
   float maxRMS = -10;
   float pPressure = 0;
   for (;;)
   {
+    delay(1);
     Sensor.readSensor();
     Sensor.getSensorValue(&Data);
-    Filesystem.logData(Data.getRawSensorData(), "raw");
-    Filesystem.logData(Data.getKalmanFilteredData(), "kalman");
     float rms = sqrt(pow(Data.getKalmanFilteredData().accelerationX, 2) + pow(Data.getKalmanFilteredData().accelerationY, 2) + pow(Data.getKalmanFilteredData().accelerationZ, 2));
     switch (Filesystem.getFlightStage())
     {
     case FLIGHTSTAGE_PRELAUNCH: // Stage 0
       if (millis() - startTime > PRELAUNCH_DELAY && Data.getKalmanFilteredData().accelerationZ < -2)
       {
+        Filesystem.logData(Data.getKalmanFilteredData(), "kalman", "launch");
+        Filesystem.logData(Data.getRawSensorData(), "raw", "launch");
         startTime = millis();
         Filesystem.systemLog("flight", "stage set to BURNOUT");
         Filesystem.setFlightStage(FLIGHTSTAGE_BURNOUT);
       }
+      if (decay_log == 20)
+      {
+        Filesystem.logData(Data.getKalmanFilteredData(), "kalman", "prelaunch");
+        Filesystem.logData(Data.getRawSensorData(), "raw", "prelaunch");
+        decay_log = 0;
+      }
+      decay_log++;
       break;
 
     case FLIGHTSTAGE_BURNOUT: // Stage 1
@@ -162,6 +162,7 @@ void flightThread(void *pvParameters)
       break;
     }
     pPressure = Data.getKalmanFilteredData().pressure;
-    delay(1);
+    Filesystem.logData(Data.getRawSensorData(), "raw");
+    Filesystem.logData(Data.getKalmanFilteredData(), "kalman");
   }
 }
