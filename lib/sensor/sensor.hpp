@@ -47,6 +47,7 @@ private:
   float gyroX = 0;
   float gyroY = 0;
   float gyroZ = 0;
+  uint32_t timestamp = 0;
   int32_t latitude = 0;
   int32_t longitude = 0;
   int32_t altitudeGPS = 0;

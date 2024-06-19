@@ -16,6 +16,7 @@
 #define DATA_HPP
 struct SensorData
 {
+  uint32_t timestamp;
   float temperature;
   float pressure;
   float altitude;
@@ -32,6 +33,7 @@ struct SensorData
 
 struct RadioPacket
 {
+  uint32_t timestamp;
   int32_t latitude;
   int32_t longitude;
   int32_t altitudeGPS;
@@ -60,6 +62,7 @@ public:
   void setAltitude(float alt);
   void setAcceleration(float accX, float accY, float accZ);
   void setGyroscope(float gyroX, float gyroY, float gyroZ);
+  void setTimestamp(uint32_t timestamp);
   void setAltitudeGPS(int32_t alt);
   void setLatitude(int32_t lat);
   void setLongitude(int32_t lon);
@@ -93,6 +96,7 @@ public:
   void setGyroscopeY(float gyroscopeY);
   void setGyroscopeZ(float gyroscopeZ);
   void setAltitudeGPS(int32_t altitudeGPS);
+  void setTimestamp(uint32_t timestamp);
 };
 
 #endif

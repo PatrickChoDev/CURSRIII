@@ -287,6 +287,18 @@ void CURSRData::setAltitude(float altitude)
 }
 
 /**
+ * @brief Sets the timestamp.
+ *
+ * This function sets the timestamp in the sensor data.
+ *
+ * @param timestamp The timestamp to be set.
+ */
+void CURSRData::setTimestamp(uint32_t timestamp)
+{
+  sensorData.timestamp = timestamp;
+}
+
+/**
  * @brief Sets the latitude.
  *
  * This function sets the latitude in the sensor data.

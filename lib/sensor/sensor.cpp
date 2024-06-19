@@ -104,6 +104,7 @@ void CURSRSensor::readSensor()
     checkMAXM10SSensor();
   if (gnss.getPVT(5))
   {
+    timestamp = gnss.getUnixEpoch(5);
     latitude = gnss.getLatitude(5);
     longitude = gnss.getLongitude(5);
     altitudeGPS = gnss.getAltitudeMSL(10);
@@ -129,6 +130,7 @@ void CURSRSensor::getSensorValue(CURSRData *data)
   data->setGyroscopeZ(gyroZ);
   data->setPressure(pressure);
   data->setTemperature(temperature);
+  data->setTimestamp(timestamp);
   data->setLatitude(latitude);
   data->setLongitude(longitude);
   data->setAltitudeGPS(altitudeGPS);
