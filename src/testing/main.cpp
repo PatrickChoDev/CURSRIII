@@ -4,18 +4,24 @@
 void setup()
 {
   Serial.begin(115200);
-  Serial1.setPins(23, 22);
   Wire.end();
-  pinMode(23, INPUT);
+  pinMode(21, OUTPUT);
   pinMode(22, OUTPUT);
-  Serial1.begin(115200);
 }
 
 void loop()
 {
-  if (Serial1.available() > 0)
+  if (Serial.available())
   {
-    uint8_t ch = Serial1.read();
+    char ch = Serial.read();
     Serial.printf("ch = %02X\n\r", ch);
+    if (ch == 'm')
+      digitalWrite(22, HIGH);
+    else if (ch == 'M')
+      digitalWrite(22, LOW);
+    else if (ch == 'd')
+      digitalWrite(21, HIGH);
+    else if (ch == 'D')
+      digitalWrite(21, LOW);
   }
 }

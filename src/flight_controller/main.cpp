@@ -56,6 +56,11 @@ void radioThread(void *pvParameters)
 
 void flightThread(void *pvParameters)
 {
+#if (TESTING_FLIGHTSTAGE)
+  SensorData datasheet[1050000];
+  Filesystem.loadFlightData(datasheet, 1050000);
+  int lineLoop = 0;
+#endif
   int decay_log = 0;
   Filesystem.systemLog("sensor", "setup finished");
   unsigned long startTime = millis();
@@ -64,8 +69,12 @@ void flightThread(void *pvParameters)
   for (;;)
   {
     delay(1);
+#if (!TESTING_FLIGHTSTAGE)
     Sensor.readSensor();
     Sensor.getSensorValue(&Data);
+#else
+    Data.setSensorData(datasheet[lineLoop++]);
+#endif
     float rms = sqrt(pow(Data.getKalmanFilteredData().accelerationX, 2) + pow(Data.getKalmanFilteredData().accelerationY, 2) + pow(Data.getKalmanFilteredData().accelerationZ, 2));
     switch (Filesystem.getFlightStage())
     {

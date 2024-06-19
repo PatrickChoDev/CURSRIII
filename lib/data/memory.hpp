@@ -63,10 +63,12 @@ public:
   char systemLogFilePath[50];
   char flightLogFilePath[50];
   char flightStateFilePath[50];
+  char testFlightLogFilePath[50];
   void setup();
   FlightStage getFlightStage();
   void loadFlightStage();
   void saveFlightStage();
+  void loadFlightData(SensorData *dataHandler, int lineCount);
   void setFlightStage(FlightStage flightStage);
   void appendFile(const char *path, const char *message);
   void logData(SensorData data, const char *tag = "", const char *message = "");

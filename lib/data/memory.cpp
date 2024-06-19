@@ -12,6 +12,7 @@ void CURSRFilesystem::setup()
   sprintf(systemLogFilePath, "/system_log_%d.csv", RUN_ID);
   sprintf(flightLogFilePath, "/flight_log_%d.csv", RUN_ID);
   sprintf(flightStateFilePath, "/flightstate_%d.e", RUN_ID);
+  sprintf(testFlightLogFilePath, "/test_flight_log.csv", RUN_ID);
   log("File paths set.\n");
   SDSPI->begin(SD_CARD_SCK_PIN, SD_CARD_MISO_PIN, SD_CARD_MOSI_PIN, SD_CARD_SS_PIN);
   if (SD.begin(SD_CARD_SS_PIN, *SDSPI))
@@ -116,6 +117,37 @@ void CURSRFilesystem::saveFlightStage()
   flightStageFile.write(flightStage);
   flightStageFile.close();
   log("Flight stage saved.\n");
+}
+
+void CURSRFilesystem::loadFlightData(SensorData *dataHandler, int lineCount)
+{
+  if (!memoryAvailable)
+  {
+    log("Memory not available.\n");
+    return;
+  }
+  log("Loading flight data...\n");
+  File flightLogFile = SD.open(testFlightLogFilePath, FILE_READ);
+  if (!flightLogFile)
+  {
+    log("Failed to open flight log file\n");
+    return;
+  }
+  flightLogFile.readStringUntil('\n'); // Skip first line
+  int count = 0;
+  while (flightLogFile.available() && count <= lineCount)
+  {
+    String line = flightLogFile.readStringUntil('\n');
+    int got = sscanf(line.c_str(), "%s,%.4f,%.4f,%.4f,%.4f,%d,%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f\n", &dataHandler[count].temperature, &dataHandler[count].pressure, &dataHandler[count].altitude, &dataHandler[count].altitudeGPS, &dataHandler[count].latitude, &dataHandler[count].longitude, &dataHandler[count].accelerationX, &dataHandler[count].accelerationY, &dataHandler[count].accelerationZ, &dataHandler[count].gyroscopeX, &dataHandler[count].gyroscopeY, &dataHandler[count].gyroscopeZ);
+    if (got != 12)
+    {
+      log("Failed to parse flight data at Line " + count + "\n");
+      break;
+    }
+    count++;
+  }
+  flightLogFile.close();
+  log("Flight data loaded.\n");
 }
 
 void CURSRFilesystem::setFlightStage(FlightStage flightStage)

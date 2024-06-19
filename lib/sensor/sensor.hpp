@@ -50,6 +50,9 @@ private:
   int32_t latitude = 0;
   int32_t longitude = 0;
   int32_t altitudeGPS = 0;
+#if (TESTING_FLIGHTSTAGE)
+  int line = 0;
+#endif
   void log(String message);
   void checkBMP390Sensor();
   void checkBNO055Sensor();
