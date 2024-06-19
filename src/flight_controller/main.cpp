@@ -76,10 +76,11 @@ void flightThread(void *pvParameters)
     Data.setSensorData(datasheet[lineLoop++]);
 #endif
     float rms = sqrt(pow(Data.getKalmanFilteredData().accelerationX, 2) + pow(Data.getKalmanFilteredData().accelerationY, 2) + pow(Data.getKalmanFilteredData().accelerationZ, 2));
+    Serial.printf("Flightstage: %d, RMS: %f\r\n", Filesystem.getFlightStage(), rms);
     switch (Filesystem.getFlightStage())
     {
     case FLIGHTSTAGE_PRELAUNCH: // Stage 0
-      if (millis() - startTime > PRELAUNCH_DELAY && Data.getKalmanFilteredData().accelerationZ < -2)
+      if (millis() - startTime > PRELAUNCH_DELAY && rms > 150)
       {
         Filesystem.logData(Data.getKalmanFilteredData(), "kalman", "launch");
         Filesystem.logData(Data.getRawSensorData(), "raw", "launch");
@@ -87,7 +88,7 @@ void flightThread(void *pvParameters)
         Filesystem.systemLog("flight", "stage set to BURNOUT");
         Filesystem.setFlightStage(FLIGHTSTAGE_BURNOUT);
       }
-      if (decay_log == 20)
+      if (decay_log == 10)
       {
         Filesystem.logData(Data.getKalmanFilteredData(), "kalman", "prelaunch");
         Filesystem.logData(Data.getRawSensorData(), "raw", "prelaunch");
@@ -103,18 +104,17 @@ void flightThread(void *pvParameters)
         {
           Filesystem.systemLog("flight", "stage set to COASTING");
           Filesystem.setFlightStage(FLIGHTSTAGE_COASTING);
+          startTime = millis();
         }
       }
       else
       {
         maxRMS = rms;
       }
-      startTime = millis();
       break;
 
     case FLIGHTSTAGE_COASTING: // Stage 2
-                               // if (Data.getKalmanFilteredData().pressure > pPressure && Data.getKalmanFilteredData().pressure < APOGEE_PRESSURE_THRESHOLD && rms < APOGEE_ACCELERATION_THRESHOLD)
-      if (Data.getKalmanFilteredData().pressure > pPressure)
+      if (Data.getKalmanFilteredData().pressure > pPressure && Data.getKalmanFilteredData().pressure < APOGEE_PRESSURE_THRESHOLD)
       {
         if (startTime > COASTING_DELAY)
         {
@@ -150,13 +150,10 @@ void flightThread(void *pvParameters)
     case FLIGHTSTAGE_LANDING: // Stage 5
       if (startTime > MAIN_PARACHUTE_HIGH_DELAY)
         digitalWrite(MAIN_PARACHUTE_EJECTION_PIN, LOW);
-      if (rms > POSTFLIGHT_ACCELERATION_THRESHOLD)
-      {
-        Filesystem.systemLog("flight", "stage set to POSTFLIGHT");
-        Filesystem.setFlightStage(FLIGHTSTAGE_POSTFLIGHT);
-        startTime = millis();
-        break;
-      }
+      Filesystem.systemLog("flight", "stage set to POSTFLIGHT");
+      Filesystem.setFlightStage(FLIGHTSTAGE_POSTFLIGHT);
+      startTime = millis();
+      break;
       break;
 
     case FLIGHTSTAGE_POSTFLIGHT: // Stage 6
