@@ -73,6 +73,7 @@ void flightThread(void *pvParameters)
     Sensor.readSensor();
     Sensor.getSensorValue(&Data);
     SensorData currentKalmanData = Data.getKalmanFilteredData();
+    SensorData currentRawData = Data.getRawSensorData();
     float rms = sqrt(pow(currentKalmanData.accelerationX, 2) + pow(currentKalmanData.accelerationY, 2) + pow(currentKalmanData.accelerationZ, 2));
     FlightStage currentFlightState = Filesystem.getFlightStage();
     Serial.printf("Flightstage: %d, RMS: %f Pressure: %f Altitude: %f\r\n", currentFlightState, rms, currentKalmanData.pressure, currentKalmanData.altitude);
@@ -86,13 +87,8 @@ void flightThread(void *pvParameters)
           Filesystem.logData(databuffer[i], "raw", "prelaunch buffer");
           Filesystem.logData(kalmanbuffer[i], "kalman", "prelaunch buffer");
         }
-        for (int i = 0; i < buffer_idx; i++)
-        {
-          Filesystem.logData(databuffer[i], "raw", "prelaunch buffer");
-          Filesystem.logData(kalmanbuffer[i], "kalman", "prelaunch buffer");
-        }
-        Filesystem.logData(Data.getKalmanFilteredData(), "kalman", "launch");
-        Filesystem.logData(Data.getRawSensorData(), "raw", "launch");
+        Filesystem.logData(currentKalmanData, "kalman", "launch");
+        Filesystem.logData(currentRawData, "raw", "launch");
         startTime = millis();
         Filesystem.systemLog("flight", "stage set to BURNOUT");
         Filesystem.setFlightStage(FLIGHTSTAGE_BOOSTING);
@@ -100,7 +96,7 @@ void flightThread(void *pvParameters)
       break;
 
     case FLIGHTSTAGE_BOOSTING: // Stage 1
-      if (rms < maxRMS - 8)
+      if (rms < maxRMS - 8) // Motor burned out
       {
         if (startTime > BURNOUT_DELAY)
         {
@@ -116,7 +112,7 @@ void flightThread(void *pvParameters)
       break;
 
     case FLIGHTSTAGE_COASTING: // Stage 2
-      if (Data.getKalmanFilteredData().pressure < APOGEE_PRESSURE_THRESHOLD && Data.getKalmanFilteredData().pressure > pPressure)
+      if (currentKalmanData.pressure < APOGEE_PRESSURE_THRESHOLD && currentKalmanData.pressure > pPressure)
       {
         if (coasting_lock == 0)
         {
@@ -128,7 +124,7 @@ void flightThread(void *pvParameters)
           Filesystem.setFlightStage(FLIGHTSTAGE_APOGEE);
         }
       }
-      else if (Data.getKalmanFilteredData().pressure < APOGEE_PRESSURE_THRESHOLD)
+      else if (currentKalmanData.pressure < APOGEE_PRESSURE_THRESHOLD)
       {
         coasting_lock = millis();
       }
@@ -145,13 +141,12 @@ void flightThread(void *pvParameters)
     case FLIGHTSTAGE_DESCENT: // Stage 4
       if (startTime > DROUGE_PARACHUTE_HIGH_DELAY)
         digitalWrite(DROUGE_PARACHUTE_EJECTION_PIN, LOW);
-      if (Data.getKalmanFilteredData().altitude < 83500)
+      if (currentKalmanData.altitude < 83500)
       {
         digitalWrite(MAIN_PARACHUTE_EJECTION_PIN, HIGH);
         Filesystem.systemLog("flight", "stage set to LANDING");
         Filesystem.setFlightStage(FLIGHTSTAGE_LANDING);
         startTime = millis();
-        break;
       }
       break;
 
@@ -162,12 +157,11 @@ void flightThread(void *pvParameters)
       Filesystem.setFlightStage(FLIGHTSTAGE_POSTFLIGHT);
       startTime = millis();
       break;
-      break;
 
     case FLIGHTSTAGE_POSTFLIGHT: // Stage 6
-      Filesystem.logData(Data.getKalmanFilteredData(), "kalman", "postflight");
-      Filesystem.logData(Data.getRawSensorData(), "raw", "postflight");
-      if (millis() - startTime > POSTFLIGHT_DELAY && abs(Data.getKalmanFilteredData().pressure - pPressure) > 0.1 * pPressure)
+      Filesystem.logData(currentKalmanData, "kalman", "postflight");
+      Filesystem.logData(currentRawData, "raw", "postflight");
+      if (millis() - startTime > POSTFLIGHT_DELAY && abs(currentKalmanData.pressure - pPressure) > 0.1 * pPressure)
       {
         vTaskDelete(flightTask);
       }
@@ -175,23 +169,25 @@ void flightThread(void *pvParameters)
     default:
       break;
     }
-    pPressure = Data.getKalmanFilteredData().pressure;
-    if (Filesystem.getFlightStage() != FLIGHTSTAGE_PRELAUNCH)
+
+    // Save data
+    pPressure = currentKalmanData.pressure;
+    if (Filesystem.getFlightStage() == FLIGHTSTAGE_PRELAUNCH)
     {
-      Filesystem.logData(Data.getRawSensorData(), "raw");
-      Filesystem.logData(Data.getKalmanFilteredData(), "kalman");
-    }
-    else
-    {
-      databuffer[buffer_idx] = Data.getRawSensorData();
-      databuffer[buffer_idx] = Data.getKalmanFilteredData();
+      databuffer[buffer_idx] = currentRawData;
+      databuffer[buffer_idx] = currentKalmanData;
       buffer_idx++;
       if (buffer_idx >= BUFFER_SIZE)
       {
-        Filesystem.logData(Data.getRawSensorData(), "raw", "prelaunch");
-        Filesystem.logData(Data.getKalmanFilteredData(), "kalman", "prelaunch");
+        Filesystem.logData(currentRawData, "raw", "prelaunch");
+        Filesystem.logData(currentKalmanData, "kalman", "prelaunch");
         buffer_idx = 0;
       }
+    }
+    else
+    {
+      Filesystem.logData(currentRawData, "raw");
+      Filesystem.logData(currentKalmanData, "kalman");
     }
   }
 }
