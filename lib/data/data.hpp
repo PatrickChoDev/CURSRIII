@@ -94,6 +94,7 @@ public:
   char *getEncodedKalmanData();
   char *getLogSensorData();
   char *getLogKalmanData();
+  char *getEncodedRadioPacket(int flightStage);
   void decodeSensorData(char *encodedData);
   void setTemperature(float temperature);
   void setPressure(float pressure);

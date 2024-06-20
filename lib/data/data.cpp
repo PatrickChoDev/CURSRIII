@@ -220,6 +220,21 @@ char IRAM_ATTR *CURSRData::getEncodedKalmanData()
   return encodedData;
 }
 
+char IRAM_ATTR *CURSRData::getEncodedRadioPacket(int flightStage)
+{
+  char *encodedData = new char[sizeof(RadioPacket)];
+  RadioPacket radioPacket;
+  SensorData sense = this->getKalmanFilteredData();
+  SensorData rawSense = this->getRawSensorData();
+  radioPacket.altitude = sense.altitude;
+  radioPacket.latitude = rawSense.latitude;
+  radioPacket.longitude = rawSense.longitude;
+  radioPacket.altitudeGPS = rawSense.altitudeGPS;
+  radioPacket.flightStage = flightStage;
+  memcpy(encodedData, &radioPacket, sizeof(RadioPacket));
+  return encodedData;
+}
+
 /**
  * @brief Returns the sensor data in a log format.
  *

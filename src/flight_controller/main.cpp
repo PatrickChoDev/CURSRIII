@@ -51,7 +51,7 @@ void radioThread(void *pvParameters)
   Filesystem.systemLog("lora", "lora ready");
   for (;;)
   {
-    Radio.send(Data.getEncodedSensorData());
+    Radio.send(Data.getEncodedRadioPacket(Filesystem.getFlightStage()));
     delay(Filesystem.getFlightStage() == FLIGHTSTAGE_PRELAUNCH ? 1500 : 50);
   }
   return;
@@ -96,7 +96,7 @@ void flightThread(void *pvParameters)
       break;
 
     case FLIGHTSTAGE_BURNOUT: // Stage 1
-      if (rms < maxRMS)
+      if (rms < maxRMS - 8)
       {
         if (startTime > BURNOUT_DELAY)
         {
@@ -105,7 +105,7 @@ void flightThread(void *pvParameters)
           startTime = millis();
         }
       }
-      else
+      else if (rms > maxRMS)
       {
         maxRMS = rms;
       }
