@@ -72,9 +72,11 @@ void flightThread(void *pvParameters)
     delay(1);
     Sensor.readSensor();
     Sensor.getSensorValue(&Data);
-    float rms = sqrt(pow(Data.getKalmanFilteredData().accelerationX, 2) + pow(Data.getKalmanFilteredData().accelerationY, 2) + pow(Data.getKalmanFilteredData().accelerationZ, 2));
-    Serial.printf("Flightstage: %d, RMS: %f Pressure: %f Altitude: %f\r\n", Filesystem.getFlightStage(), rms, Data.getKalmanFilteredData().pressure, Data.getKalmanFilteredData().altitude);
-    switch (Filesystem.getFlightStage())
+    SensorData currentKalmanData = Data.getKalmanFilteredData();
+    float rms = sqrt(pow(currentKalmanData.accelerationX, 2) + pow(currentKalmanData.accelerationY, 2) + pow(currentKalmanData.accelerationZ, 2));
+    FlightStage currentFlightState = Filesystem.getFlightStage();
+    Serial.printf("Flightstage: %d, RMS: %f Pressure: %f Altitude: %f\r\n", currentFlightState, rms, currentKalmanData.pressure, currentKalmanData.altitude);
+    switch (currentFlightState)
     {
     case FLIGHTSTAGE_PRELAUNCH: // Stage 0
       if (millis() - startTime > PRELAUNCH_DELAY && rms > 150)
@@ -93,11 +95,11 @@ void flightThread(void *pvParameters)
         Filesystem.logData(Data.getRawSensorData(), "raw", "launch");
         startTime = millis();
         Filesystem.systemLog("flight", "stage set to BURNOUT");
-        Filesystem.setFlightStage(FLIGHTSTAGE_BURNOUT);
+        Filesystem.setFlightStage(FLIGHTSTAGE_BOOSTING);
       }
       break;
 
-    case FLIGHTSTAGE_BURNOUT: // Stage 1
+    case FLIGHTSTAGE_BOOSTING: // Stage 1
       if (rms < maxRMS - 8)
       {
         if (startTime > BURNOUT_DELAY)
