@@ -25,6 +25,12 @@ struct SensorData
   float accelerationX;
   float accelerationY;
   float accelerationZ;
+  float orientationX;
+  float orientationY;
+  float orientationZ;
+  float magneticX;
+  float magneticY;
+  float magneticZ;
   float gyroscopeX;
   float gyroscopeY;
   float gyroscopeZ;
@@ -47,6 +53,12 @@ private:
   SimpleKalmanFilter accelerationX = SimpleKalmanFilter(1, 1, 0.1);
   SimpleKalmanFilter accelerationY = SimpleKalmanFilter(1, 1, 0.1);
   SimpleKalmanFilter accelerationZ = SimpleKalmanFilter(1, 1, 0.1);
+  SimpleKalmanFilter orientationX = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter orientationY = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter orientationZ = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter magneticX = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter magneticY = SimpleKalmanFilter(1, 1, 0.01);
+  SimpleKalmanFilter magneticZ = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter gyroscopeX = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter gyroscopeY = SimpleKalmanFilter(1, 1, 0.01);
   SimpleKalmanFilter gyroscopeZ = SimpleKalmanFilter(1, 1, 0.01);
@@ -59,6 +71,8 @@ public:
   void setPressure(float pres);
   void setAltitude(float alt);
   void setAcceleration(float accX, float accY, float accZ);
+  void setOrientation(float orientX, float orientY, float orientZ);
+  void setMagnetic(float magX, float magY, float magZ);
   void setGyroscope(float gyroX, float gyroY, float gyroZ);
   void setAltitudeGPS(int32_t alt);
   void setLatitude(int32_t lat);
@@ -89,6 +103,12 @@ public:
   void setAccelerationX(float accelerationX);
   void setAccelerationY(float accelerationY);
   void setAccelerationZ(float accelerationZ);
+  void setOrientationX(float orientationX);
+  void setOrientationY(float orientationY);
+  void setOrientationZ(float orientationZ);
+  void setMagneticX(float magneticX);
+  void setMagneticY(float magneticY);
+  void setMagneticZ(float magneticZ);
   void setGyroscopeX(float gyroscopeX);
   void setGyroscopeY(float gyroscopeY);
   void setGyroscopeZ(float gyroscopeZ);

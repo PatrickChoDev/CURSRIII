@@ -47,6 +47,12 @@ private:
   float gyroX = 0;
   float gyroY = 0;
   float gyroZ = 0;
+  float orientationX = 0;
+  float orientationY = 0;
+  float orientationZ = 0;
+  float magneticX = 0;
+  float magneticY = 0;
+  float magneticZ = 0;
   int32_t latitude = 0;
   int32_t longitude = 0;
   int32_t altitudeGPS = 0;

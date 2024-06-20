@@ -42,7 +42,7 @@ void CURSRSensor::log(String message)
  *
  * This function reads the sensor value and stores it in the sensor value variables.
  */
-void CURSRSensor::readSensor()
+void IRAM_ATTR CURSRSensor::readSensor()
 {
 #if (BMP390_ENABLED)
   if (bmp390Available)
@@ -52,7 +52,7 @@ void CURSRSensor::readSensor()
     pressure = bmp.readPressure();
   }
 #endif
-  sensors_event_t event, linearAccelData, angVelData, orientationData, accelData;
+  sensors_event_t event, magnetometerData, angVelData, orientationData, accelData;
 #if (ADXL375_ENABLED)
   if (ADXLAvailable)
   {
@@ -62,10 +62,16 @@ void CURSRSensor::readSensor()
 #if (BNO055_ENABLED)
   if (bnoAvailable)
   {
-    bno.getEvent(&linearAccelData, Adafruit_BNO055::VECTOR_LINEARACCEL);
     bno.getEvent(&angVelData, Adafruit_BNO055::VECTOR_GYROSCOPE);
     bno.getEvent(&orientationData, Adafruit_BNO055::VECTOR_EULER);
     bno.getEvent(&accelData, Adafruit_BNO055::VECTOR_ACCELEROMETER);
+    bno.getEvent(&magnetometerData, Adafruit_BNO055::VECTOR_MAGNETOMETER);
+    orientationX = orientationData.orientation.x;
+    orientationY = orientationData.orientation.y;
+    orientationZ = orientationData.orientation.z;
+    magneticX = magnetometerData.magnetic.x;
+    magneticY = magnetometerData.magnetic.y;
+    magneticZ = magnetometerData.magnetic.z;
   }
 #endif
 #if (ADXL375_ENABLED || BNO055_ENABLED)
@@ -118,7 +124,7 @@ void CURSRSensor::readSensor()
  *
  * @param data The data object to store the sensor value.
  */
-void CURSRSensor::getSensorValue(CURSRData *data)
+void IRAM_ATTR CURSRSensor::getSensorValue(CURSRData *data)
 {
   data->setAltitude(altitude);
   data->setAccelerationX(accelX);
@@ -127,6 +133,9 @@ void CURSRSensor::getSensorValue(CURSRData *data)
   data->setGyroscopeX(gyroX);
   data->setGyroscopeY(gyroY);
   data->setGyroscopeZ(gyroZ);
+  data->setOrientationX(orientationX);
+  data->setOrientationY(orientationY);
+  data->setOrientationZ(orientationZ);
   data->setPressure(pressure);
   data->setTemperature(temperature);
   data->setLatitude(latitude);
@@ -134,7 +143,7 @@ void CURSRSensor::getSensorValue(CURSRData *data)
   data->setAltitudeGPS(altitudeGPS);
 }
 
-void CURSRSensor::setBMP390Available(bool available)
+void IRAM_ATTR CURSRSensor::setBMP390Available(bool available)
 {
   bmp390Available = available;
 }

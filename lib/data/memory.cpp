@@ -45,7 +45,7 @@ void CURSRFilesystem::setup()
     {
       log("Flight log file does not exist.\n");
       File flightLogFile = SD.open(flightLogFilePath, FILE_WRITE);
-      flightLogFile.print("Timestamp,Tag,Message,Temperature,Pressure,Altitude,GPSAltitude,Latitude,Longitude,AccelerationX,AccelerationY,AccelerationZ,GyroscopeX,GyroscopeY,GyroscopeZ\n");
+      flightLogFile.print("Timestamp,Tag,Message,Temperature,Pressure,Altitude,GPSAltitude,Latitude,Longitude,AccelerationX,AccelerationY,AccelerationZ,OrientationX,OrientationY,OrientationZ,MagneticX,MagneticY,MagneticZ,GyroscopeX,GyroscopeY,GyroscopeZ\n");
       flightLogFile.close();
     }
 
@@ -98,7 +98,7 @@ FlightStage CURSRFilesystem::getFlightStage()
   return flightStage;
 }
 
-void CURSRFilesystem::loadFlightStage()
+void IRAM_ATTR CURSRFilesystem::loadFlightStage()
 {
   if (!memoryAvailable)
   {
@@ -110,7 +110,7 @@ void CURSRFilesystem::loadFlightStage()
   log("Flight stage loaded.\n");
 }
 
-void CURSRFilesystem::saveFlightStage()
+void IRAM_ATTR CURSRFilesystem::saveFlightStage()
 {
   log("Saving flight stage...\n");
   File flightStageFile = SD.open(flightStateFilePath, FILE_WRITE);
@@ -119,7 +119,7 @@ void CURSRFilesystem::saveFlightStage()
   log("Flight stage saved.\n");
 }
 
-void CURSRFilesystem::loadFlightData(SensorData *dataHandler, int lineCount)
+void IRAM_ATTR CURSRFilesystem::loadFlightData(SensorData *dataHandler, int lineCount)
 {
   if (!memoryAvailable)
   {
@@ -138,7 +138,7 @@ void CURSRFilesystem::loadFlightData(SensorData *dataHandler, int lineCount)
   while (flightLogFile.available() && count <= lineCount)
   {
     String line = flightLogFile.readStringUntil('\n');
-    int got = sscanf(line.c_str(), "%s,%.4f,%.4f,%.4f,%.4f,%d,%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f\n", &dataHandler[count].temperature, &dataHandler[count].pressure, &dataHandler[count].altitude, &dataHandler[count].altitudeGPS, &dataHandler[count].latitude, &dataHandler[count].longitude, &dataHandler[count].accelerationX, &dataHandler[count].accelerationY, &dataHandler[count].accelerationZ, &dataHandler[count].gyroscopeX, &dataHandler[count].gyroscopeY, &dataHandler[count].gyroscopeZ);
+    int got = sscanf(line.c_str(), "%s,%.6f,%.6f,%.6f,%.6f,%d,%d,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n", &dataHandler[count].temperature, &dataHandler[count].pressure, &dataHandler[count].altitude, &dataHandler[count].altitudeGPS, &dataHandler[count].latitude, &dataHandler[count].longitude, &dataHandler[count].accelerationX, &dataHandler[count].accelerationY, &dataHandler[count].accelerationZ, &dataHandler[count].orientationX, &dataHandler[count].orientationY, &dataHandler[count].orientationZ, &dataHandler[count].magneticX, &dataHandler[count].magneticY, &dataHandler[count].magneticZ, &dataHandler[count].gyroscopeX, &dataHandler[count].gyroscopeY, &dataHandler[count].gyroscopeZ);
     if (got != 12)
     {
       log("Failed to parse flight data at Line " + count + "\n");
@@ -150,7 +150,7 @@ void CURSRFilesystem::loadFlightData(SensorData *dataHandler, int lineCount)
   log("Flight data loaded.\n");
 }
 
-void CURSRFilesystem::setFlightStage(FlightStage flightStage)
+void IRAM_ATTR CURSRFilesystem::setFlightStage(FlightStage flightStage)
 {
   this->flightStage = flightStage;
   saveFlightStage();
@@ -183,7 +183,7 @@ void CURSRFilesystem::appendFile(const char *path, const char *message)
   file.close();
 }
 
-void CURSRFilesystem::logData(SensorData sensorData, const char *tag, const char *message)
+void IRAM_ATTR CURSRFilesystem::logData(SensorData sensorData, const char *tag, const char *message)
 {
   // Get current timestamp
   if (!memoryAvailable)
@@ -198,11 +198,11 @@ void CURSRFilesystem::logData(SensorData sensorData, const char *tag, const char
   flightLogFile.print(",");
   flightLogFile.print(message);
   flightLogFile.print(",");
-  flightLogFile.printf("%.4f,%.4f,%.4f,%.4f,%d,%d,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f\n", sensorData.temperature, sensorData.pressure, sensorData.altitude, sensorData.altitudeGPS, sensorData.latitude, sensorData.longitude, sensorData.accelerationX, sensorData.accelerationY, sensorData.accelerationZ, sensorData.gyroscopeX, sensorData.gyroscopeY, sensorData.gyroscopeZ);
+  flightLogFile.printf("%.6f,%.6f,%.6f,%.6f,%d,%d,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f,%.6f\n", sensorData.temperature, sensorData.pressure, sensorData.altitude, sensorData.altitudeGPS, sensorData.latitude, sensorData.longitude, sensorData.accelerationX, sensorData.accelerationY, sensorData.accelerationZ, sensorData.orientationX, sensorData.orientationY, sensorData.orientationZ, sensorData.magneticX, sensorData.magneticY, sensorData.magneticZ, sensorData.gyroscopeX, sensorData.gyroscopeY, sensorData.gyroscopeZ);
   flightLogFile.close();
 }
 
-void CURSRFilesystem::systemLog(const char *tag, const char *message)
+void IRAM_ATTR CURSRFilesystem::systemLog(const char *tag, const char *message)
 {
   if (!memoryAvailable)
     return;

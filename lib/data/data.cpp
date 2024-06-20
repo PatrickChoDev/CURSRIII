@@ -7,7 +7,7 @@
  *
  * @return The Kalman filtered data.
  */
-SensorData KalmanFilterMetrics::getKalmanData()
+SensorData IRAM_ATTR KalmanFilterMetrics::getKalmanData()
 {
   return kalmanData;
 }
@@ -19,7 +19,7 @@ SensorData KalmanFilterMetrics::getKalmanData()
  *
  * @param temp The temperature to be set.
  */
-void KalmanFilterMetrics::setTemperature(float temp)
+void IRAM_ATTR KalmanFilterMetrics::setTemperature(float temp)
 {
   kalmanData.temperature = temperature.updateEstimate(temp);
 }
@@ -31,7 +31,7 @@ void KalmanFilterMetrics::setTemperature(float temp)
  *
  * @param pres The pressure to be set.
  */
-void KalmanFilterMetrics::setPressure(float pres)
+void IRAM_ATTR KalmanFilterMetrics::setPressure(float pres)
 {
   kalmanData.pressure = pressure.updateEstimate(pres);
 }
@@ -43,7 +43,7 @@ void KalmanFilterMetrics::setPressure(float pres)
  *
  * @param alt The altitude to be set.
  */
-void KalmanFilterMetrics::setAltitude(float alt)
+void IRAM_ATTR KalmanFilterMetrics::setAltitude(float alt)
 {
   kalmanData.altitude = altitude.updateEstimate(alt);
 }
@@ -57,11 +57,25 @@ void KalmanFilterMetrics::setAltitude(float alt)
  * @param accY The acceleration in the Y-axis to be set.
  * @param accZ The acceleration in the Z-axis to be set.
  */
-void KalmanFilterMetrics::setAcceleration(float accX, float accY, float accZ)
+void IRAM_ATTR KalmanFilterMetrics::setAcceleration(float accX, float accY, float accZ)
 {
   kalmanData.accelerationX = accelerationX.updateEstimate(accX);
   kalmanData.accelerationY = accelerationY.updateEstimate(accY);
   kalmanData.accelerationZ = accelerationZ.updateEstimate(accZ);
+}
+
+void IRAM_ATTR KalmanFilterMetrics::setOrientation(float orientX, float orientY, float orientZ)
+{
+  kalmanData.orientationX = orientationX.updateEstimate(orientX);
+  kalmanData.orientationY = orientationY.updateEstimate(orientY);
+  kalmanData.orientationZ = orientationZ.updateEstimate(orientZ);
+}
+
+void IRAM_ATTR KalmanFilterMetrics::setMagnetic(float magX, float magY, float magZ)
+{
+  kalmanData.magneticX = magneticX.updateEstimate(magX);
+  kalmanData.magneticY = magneticY.updateEstimate(magY);
+  kalmanData.magneticZ = magneticZ.updateEstimate(magZ);
 }
 
 /**
@@ -73,7 +87,7 @@ void KalmanFilterMetrics::setAcceleration(float accX, float accY, float accZ)
  * @param gyroY The gyroscope in the Y-axis to be set.
  * @param gyroZ The gyroscope in the Z-axis to be set.
  */
-void KalmanFilterMetrics::setGyroscope(float gyroX, float gyroY, float gyroZ)
+void IRAM_ATTR KalmanFilterMetrics::setGyroscope(float gyroX, float gyroY, float gyroZ)
 {
   kalmanData.gyroscopeX = gyroscopeX.updateEstimate(gyroX);
   kalmanData.gyroscopeY = gyroscopeY.updateEstimate(gyroY);
@@ -87,7 +101,7 @@ void KalmanFilterMetrics::setGyroscope(float gyroX, float gyroY, float gyroZ)
  *
  * @param alt The GPS altitude to be set.
  */
-void KalmanFilterMetrics::setAltitudeGPS(int32_t alt)
+void IRAM_ATTR KalmanFilterMetrics::setAltitudeGPS(int32_t alt)
 {
   kalmanData.altitudeGPS = alt;
 }
@@ -99,7 +113,7 @@ void KalmanFilterMetrics::setAltitudeGPS(int32_t alt)
  *
  * @param lat The latitude to be set.
  */
-void KalmanFilterMetrics::setLatitude(int32_t lat)
+void IRAM_ATTR KalmanFilterMetrics::setLatitude(int32_t lat)
 {
   kalmanData.latitude = lat;
 }
@@ -111,7 +125,7 @@ void KalmanFilterMetrics::setLatitude(int32_t lat)
  *
  * @param lon The longitude to be set.
  */
-void KalmanFilterMetrics::setLongitude(int32_t lon)
+void IRAM_ATTR KalmanFilterMetrics::setLongitude(int32_t lon)
 {
   kalmanData.longitude = lon;
 }
@@ -138,7 +152,7 @@ void CURSRData::log(String message)
  *
  * @return The sensor data.
  */
-SensorData CURSRData::getRawSensorData()
+SensorData IRAM_ATTR CURSRData::getRawSensorData()
 {
   return sensorData;
 }
@@ -150,7 +164,7 @@ SensorData CURSRData::getRawSensorData()
  *
  * @return THe calculated sensor data.
  */
-SensorData CURSRData::getKalmanFilteredData()
+SensorData IRAM_ATTR CURSRData::getKalmanFilteredData()
 {
   return kalmanFilterMetrics.getKalmanData();
 }
@@ -162,12 +176,13 @@ SensorData CURSRData::getKalmanFilteredData()
  *
  * @param sensorData The sensor data to be set.
  */
-void CURSRData::setSensorData(SensorData sensorData)
+void IRAM_ATTR CURSRData::setSensorData(SensorData sensorData)
 {
   this->sensorData = sensorData;
   kalmanFilterMetrics.setTemperature(sensorData.temperature);
   kalmanFilterMetrics.setPressure(sensorData.pressure);
   kalmanFilterMetrics.setAcceleration(sensorData.accelerationX, sensorData.accelerationY, sensorData.accelerationZ);
+  kalmanFilterMetrics.setOrientation(sensorData.orientationX, sensorData.orientationY, sensorData.orientationZ);
   kalmanFilterMetrics.setGyroscope(sensorData.gyroscopeX, sensorData.gyroscopeY, sensorData.gyroscopeZ);
 }
 
@@ -178,7 +193,7 @@ void CURSRData::setSensorData(SensorData sensorData)
  *
  * @return The encoded sensor data.
  */
-char *CURSRData::getEncodedSensorData()
+char IRAM_ATTR *CURSRData::getEncodedSensorData()
 {
   char *encodedData = new char[sizeof(SensorData)];
   SensorData sense = this->getRawSensorData();
@@ -193,7 +208,7 @@ char *CURSRData::getEncodedSensorData()
  *
  * @return The encoded Kalman filtered data.
  */
-char *CURSRData::getEncodedKalmanData()
+char IRAM_ATTR *CURSRData::getEncodedKalmanData()
 {
   char *encodedData = new char[sizeof(SensorData)];
   SensorData sense = this->getKalmanFilteredData();
@@ -212,7 +227,7 @@ char *CURSRData::getEncodedKalmanData()
  *
  * @return The sensor data in a log format.
  */
-char *CURSRData::getLogSensorData()
+char IRAM_ATTR *CURSRData::getLogSensorData()
 {
   char *logData = new char[100];
   SensorData sense = this->getRawSensorData();
@@ -227,7 +242,7 @@ char *CURSRData::getLogSensorData()
  *
  * @return The Kalman filtered data in a log format.
  */
-char *CURSRData::getLogKalmanData()
+char IRAM_ATTR *CURSRData::getLogKalmanData()
 {
   char *logData = new char[100];
   SensorData sense = this->getKalmanFilteredData();
@@ -242,7 +257,7 @@ char *CURSRData::getLogKalmanData()
  *
  * @param encodedData The encoded sensor data.
  */
-void CURSRData::decodeSensorData(char *encodedData)
+void IRAM_ATTR CURSRData::decodeSensorData(char *encodedData)
 {
   memcpy(&sensorData, encodedData, sizeof(SensorData));
 }
@@ -254,7 +269,7 @@ void CURSRData::decodeSensorData(char *encodedData)
  *
  * @param temperature The temperature to be set.
  */
-void CURSRData::setTemperature(float temperature)
+void IRAM_ATTR CURSRData::setTemperature(float temperature)
 {
   sensorData.temperature = temperature;
   kalmanFilterMetrics.setTemperature(temperature);
@@ -267,7 +282,7 @@ void CURSRData::setTemperature(float temperature)
  *
  * @param pressure The pressure to be set.
  */
-void CURSRData::setPressure(float pressure)
+void IRAM_ATTR CURSRData::setPressure(float pressure)
 {
   sensorData.pressure = pressure;
   kalmanFilterMetrics.setPressure(pressure);
@@ -280,7 +295,7 @@ void CURSRData::setPressure(float pressure)
  *
  * @param altitude The altitude to be set.
  */
-void CURSRData::setAltitude(float altitude)
+void IRAM_ATTR CURSRData::setAltitude(float altitude)
 {
   sensorData.altitude = altitude;
   kalmanFilterMetrics.setAltitude(altitude);
@@ -293,7 +308,7 @@ void CURSRData::setAltitude(float altitude)
  *
  * @param latitude The latitude to be set.
  */
-void CURSRData::setLatitude(int32_t latitude)
+void IRAM_ATTR CURSRData::setLatitude(int32_t latitude)
 {
   sensorData.latitude = latitude;
 }
@@ -306,7 +321,7 @@ void CURSRData::setLatitude(int32_t latitude)
  * @param longitude The longitude to be set.
  */
 
-void CURSRData::setLongitude(int32_t longitude)
+void IRAM_ATTR CURSRData::setLongitude(int32_t longitude)
 {
   sensorData.longitude = longitude;
 }
@@ -318,7 +333,7 @@ void CURSRData::setLongitude(int32_t longitude)
  *
  * @param accelerationX The acceleration in the X-axis to be set.
  */
-void CURSRData::setAccelerationX(float accelerationX)
+void IRAM_ATTR CURSRData::setAccelerationX(float accelerationX)
 {
   sensorData.accelerationX = accelerationX;
   kalmanFilterMetrics.setAcceleration(accelerationX, sensorData.accelerationY, sensorData.accelerationZ);
@@ -331,7 +346,7 @@ void CURSRData::setAccelerationX(float accelerationX)
  *
  * @param accelerationY The acceleration in the Y-axis to be set.
  */
-void CURSRData::setAccelerationY(float accelerationY)
+void IRAM_ATTR CURSRData::setAccelerationY(float accelerationY)
 {
   sensorData.accelerationY = accelerationY;
   kalmanFilterMetrics.setAcceleration(sensorData.accelerationX, accelerationY, sensorData.accelerationZ);
@@ -344,10 +359,46 @@ void CURSRData::setAccelerationY(float accelerationY)
  *
  * @param accelerationZ The acceleration in the Z-axis to be set.
  */
-void CURSRData::setAccelerationZ(float accelerationZ)
+void IRAM_ATTR CURSRData::setAccelerationZ(float accelerationZ)
 {
   sensorData.accelerationZ = accelerationZ;
   kalmanFilterMetrics.setAcceleration(sensorData.accelerationX, sensorData.accelerationY, accelerationZ);
+}
+
+void IRAM_ATTR CURSRData::setOrientationX(float orientationX)
+{
+  sensorData.orientationX = orientationX;
+  kalmanFilterMetrics.setOrientation(orientationX, sensorData.orientationY, sensorData.orientationZ);
+}
+
+void IRAM_ATTR CURSRData::setOrientationY(float orientationY)
+{
+  sensorData.orientationY = orientationY;
+  kalmanFilterMetrics.setOrientation(sensorData.orientationX, orientationY, sensorData.orientationZ);
+}
+
+void IRAM_ATTR CURSRData::setOrientationZ(float orientationZ)
+{
+  sensorData.orientationZ = orientationZ;
+  kalmanFilterMetrics.setOrientation(sensorData.orientationX, sensorData.orientationY, orientationZ);
+}
+
+void IRAM_ATTR CURSRData::setMagneticX(float magneticX)
+{
+  sensorData.magneticX = magneticX;
+  kalmanFilterMetrics.setMagnetic(magneticX, sensorData.magneticY, sensorData.magneticZ);
+}
+
+void IRAM_ATTR CURSRData::setMagneticY(float magneticY)
+{
+  sensorData.magneticY = magneticY;
+  kalmanFilterMetrics.setMagnetic(sensorData.magneticX, magneticY, sensorData.magneticZ);
+}
+
+void IRAM_ATTR CURSRData::setMagneticZ(float magneticZ)
+{
+  sensorData.magneticZ = magneticZ;
+  kalmanFilterMetrics.setMagnetic(sensorData.magneticX, sensorData.magneticY, magneticZ);
 }
 
 /**
@@ -357,7 +408,7 @@ void CURSRData::setAccelerationZ(float accelerationZ)
  *
  * @param gyroscopeX The gyroscope in the X-axis to be set.
  */
-void CURSRData::setGyroscopeX(float gyroscopeX)
+void IRAM_ATTR CURSRData::setGyroscopeX(float gyroscopeX)
 {
   sensorData.gyroscopeX = gyroscopeX;
   kalmanFilterMetrics.setGyroscope(gyroscopeX, sensorData.gyroscopeY, sensorData.gyroscopeZ);
@@ -370,7 +421,7 @@ void CURSRData::setGyroscopeX(float gyroscopeX)
  *
  * @param gyroscopeY The gyroscope in the Y-axis to be set.
  */
-void CURSRData::setGyroscopeY(float gyroscopeY)
+void IRAM_ATTR CURSRData::setGyroscopeY(float gyroscopeY)
 {
   sensorData.gyroscopeY = gyroscopeY;
   kalmanFilterMetrics.setGyroscope(sensorData.gyroscopeX, gyroscopeY, sensorData.gyroscopeZ);
@@ -383,7 +434,7 @@ void CURSRData::setGyroscopeY(float gyroscopeY)
  *
  * @param gyroscopeZ The gyroscope in the Z-axis to be set.
  */
-void CURSRData::setGyroscopeZ(float gyroscopeZ)
+void IRAM_ATTR CURSRData::setGyroscopeZ(float gyroscopeZ)
 {
   sensorData.gyroscopeZ = gyroscopeZ;
   kalmanFilterMetrics.setGyroscope(sensorData.gyroscopeX, sensorData.gyroscopeY, gyroscopeZ);
@@ -396,7 +447,7 @@ void CURSRData::setGyroscopeZ(float gyroscopeZ)
  *
  * @param altitudeGPS The GPS altitude to be set.
  */
-void CURSRData::setAltitudeGPS(int32_t altitudeGPS)
+void IRAM_ATTR CURSRData::setAltitudeGPS(int32_t altitudeGPS)
 {
   sensorData.altitudeGPS = altitudeGPS;
 }
