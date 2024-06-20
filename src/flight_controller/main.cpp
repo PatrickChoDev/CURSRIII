@@ -8,8 +8,9 @@ CURSRFilesystem Filesystem;
 TaskHandle_t flightTask;
 TaskHandle_t radioTask;
 
-SensorData databuffer[100] = {};
-SensorData kalmanbuffer[100] = {};
+#define BUFFER_SIZE 100
+SensorData databuffer[BUFFER_SIZE] = {};
+SensorData kalmanbuffer[BUFFER_SIZE] = {};
 
 void radioThread(void *pvParameters);
 void flightThread(void *pvParameters);
@@ -26,7 +27,7 @@ void setup()
   xTaskCreatePinnedToCore(
       flightThread,
       "Flight Thread",
-      10000,
+      50000,
       NULL,
       tskIDLE_PRIORITY + 1,
       &flightTask,
@@ -35,7 +36,7 @@ void setup()
   xTaskCreatePinnedToCore(
       radioThread,
       "Radio Thread",
-      10000,
+      50000,
       NULL,
       tskIDLE_PRIORITY + 1,
       &radioTask,
@@ -44,6 +45,7 @@ void setup()
 
 void loop()
 {
+  vTaskDelete(NULL);
 }
 
 void radioThread(void *pvParameters)
@@ -77,7 +79,7 @@ void flightThread(void *pvParameters)
     case FLIGHTSTAGE_PRELAUNCH: // Stage 0
       if (millis() - startTime > PRELAUNCH_DELAY && rms > 150)
       {
-        for (int i = buffer_idx; i < 100; i++)
+        for (int i = buffer_idx; i < BUFFER_SIZE; i++)
         {
           Filesystem.logData(databuffer[i], "raw", "prelaunch buffer");
           Filesystem.logData(kalmanbuffer[i], "kalman", "prelaunch buffer");
@@ -182,7 +184,7 @@ void flightThread(void *pvParameters)
       databuffer[buffer_idx] = Data.getRawSensorData();
       databuffer[buffer_idx] = Data.getKalmanFilteredData();
       buffer_idx++;
-      if (buffer_idx == 100)
+      if (buffer_idx >= BUFFER_SIZE)
       {
         Filesystem.logData(Data.getRawSensorData(), "raw", "prelaunch");
         Filesystem.logData(Data.getKalmanFilteredData(), "kalman", "prelaunch");
