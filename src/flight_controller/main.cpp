@@ -53,8 +53,9 @@ void radioThread(void *pvParameters)
   Filesystem.systemLog("lora", "lora ready");
   for (;;)
   {
-    Radio.send(Data.getEncodedRadioPacket(Filesystem.getFlightStage()));
-    delay(Filesystem.getFlightStage() == FLIGHTSTAGE_PRELAUNCH ? 1500 : 50);
+    FlightStage currentRadioFlightStage = Filesystem.getFlightStage();
+    Radio.send(Data.getEncodedRadioPacket(currentRadioFlightStage));
+    delay(currentRadioFlightStage == FLIGHTSTAGE_PRELAUNCH ? 1500 : 50);
   }
   return;
 }
@@ -81,8 +82,15 @@ void flightThread(void *pvParameters)
     {
     case FLIGHTSTAGE_PRELAUNCH: // Stage 0
       if (millis() - startTime > PRELAUNCH_DELAY && rms > 150)
+      // Boost detected
       {
+        // Log prelaunch data
         for (int i = buffer_idx; i < BUFFER_SIZE; i++)
+        {
+          Filesystem.logData(databuffer[i], "raw", "prelaunch buffer");
+          Filesystem.logData(kalmanbuffer[i], "kalman", "prelaunch buffer");
+        }
+        for (int i = 0; i < buffer_idx; i++)
         {
           Filesystem.logData(databuffer[i], "raw", "prelaunch buffer");
           Filesystem.logData(kalmanbuffer[i], "kalman", "prelaunch buffer");
@@ -172,7 +180,7 @@ void flightThread(void *pvParameters)
 
     // Save data
     pPressure = currentKalmanData.pressure;
-    if (Filesystem.getFlightStage() == FLIGHTSTAGE_PRELAUNCH)
+    if (currentFlightState == FLIGHTSTAGE_PRELAUNCH)
     {
       databuffer[buffer_idx] = currentRawData;
       databuffer[buffer_idx] = currentKalmanData;
