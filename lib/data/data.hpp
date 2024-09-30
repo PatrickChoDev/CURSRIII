@@ -36,13 +36,23 @@ struct SensorData
   float gyroscopeZ;
 };
 
+enum FlightStage
+{
+  FLIGHTSTAGE_PRELAUNCH,
+  FLIGHTSTAGE_BOOSTING,
+  FLIGHTSTAGE_COASTING,
+  FLIGHTSTAGE_APOGEE,
+  FLIGHTSTAGE_DESCENT,
+  FLIGHTSTAGE_LANDING,
+  FLIGHTSTAGE_POSTFLIGHT
+};
+
 struct RadioPacket
 {
   int32_t latitude;
   int32_t longitude;
   int32_t altitudeGPS;
   float altitude;
-  int flightStage;
 };
 
 class KalmanFilterMetrics
@@ -94,7 +104,7 @@ public:
   char *getEncodedKalmanData();
   char *getLogSensorData();
   char *getLogKalmanData();
-  char *getEncodedRadioPacket(int flightStage);
+  char *getEncodedRadioPacket(FlightStage flightStage);
   void decodeSensorData(char *encodedData);
   void setTemperature(float temperature);
   void setPressure(float pressure);

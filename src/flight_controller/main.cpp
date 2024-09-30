@@ -54,6 +54,7 @@ void radioThread(void *pvParameters)
   for (;;)
   {
     FlightStage currentRadioFlightStage = Filesystem.getFlightStage();
+    Serial.println(Data.getEncodedRadioPacket(currentRadioFlightStage));
     Radio.send(Data.getEncodedRadioPacket(currentRadioFlightStage));
     delay(currentRadioFlightStage == FLIGHTSTAGE_PRELAUNCH ? 1500 : 50);
   }
@@ -104,7 +105,7 @@ void flightThread(void *pvParameters)
       break;
 
     case FLIGHTSTAGE_BOOSTING: // Stage 1
-      if (rms < maxRMS - 8) // Motor burned out
+      if (rms < maxRMS - 8)    // Motor burned out
       {
         if (startTime > BURNOUT_DELAY)
         {

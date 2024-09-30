@@ -89,7 +89,7 @@
 #endif
 
 #ifndef LORA_PAYLOAD_LENGTH
-#define LORA_PAYLOAD_LENGTH 32
+#define LORA_PAYLOAD_LENGTH 16
 #endif
 
 #ifndef LORA_HEADER_MODE

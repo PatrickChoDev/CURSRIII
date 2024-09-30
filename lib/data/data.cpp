@@ -220,7 +220,7 @@ char IRAM_ATTR *CURSRData::getEncodedKalmanData()
   return encodedData;
 }
 
-char IRAM_ATTR *CURSRData::getEncodedRadioPacket(int flightStage)
+char IRAM_ATTR *CURSRData::getEncodedRadioPacket(FlightStage flightStage)
 {
   char *encodedData = new char[sizeof(RadioPacket)];
   RadioPacket radioPacket;
@@ -230,7 +230,6 @@ char IRAM_ATTR *CURSRData::getEncodedRadioPacket(int flightStage)
   radioPacket.latitude = rawSense.latitude;
   radioPacket.longitude = rawSense.longitude;
   radioPacket.altitudeGPS = rawSense.altitudeGPS;
-  radioPacket.flightStage = flightStage;
   memcpy(encodedData, &radioPacket, sizeof(RadioPacket));
   return encodedData;
 }
